@@ -1,0 +1,11 @@
+.git
+.devcontainer
+.vscode
+.gitignore
+.travis.yml
+ci.sh
+docker-compose.yml
+Dockerfile
+LICENSE
+README.md
+title.svg
