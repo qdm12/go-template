@@ -7,14 +7,12 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-
-	"github.com/qdm12/golibs/crypto"
-	"github.com/qdm12/golibs/server"
-
 	"github.com/qdm12/golibs/admin"
+	"github.com/qdm12/golibs/crypto"
 	"github.com/qdm12/golibs/healthcheck"
 	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/golibs/network"
+	"github.com/qdm12/golibs/server"
 	"github.com/qdm12/golibs/signals"
 
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
