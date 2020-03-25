@@ -59,14 +59,48 @@
 
 ## Development
 
-### Using VSCode and Docker
+## Development
 
-1. Install [Docker](https://docs.docker.com/install/)
-    - On Windows, share a drive with Docker Desktop and have the project on that partition
-    - On OSX, share your project directory with Docker Desktop
-1. With [Visual Studio Code](https://code.visualstudio.com/download), install the [remote containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-1. In Visual Studio Code, press on `F1` and select `Remote-Containers: Open Folder in Container...`
-1. Your dev environment is ready to go!... and it's running in a container :+1:
+1. Setup your environment
+
+    <details><summary>Using VSCode and Docker</summary><p>
+
+    1. Install [Docker](https://docs.docker.com/install/)
+       - On Windows, share a drive with Docker Desktop and have the project on that partition
+       - On OSX, share your project directory with Docker Desktop
+    1. With [Visual Studio Code](https://code.visualstudio.com/download), install the [remote containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+    1. In Visual Studio Code, press on `F1` and select `Remote-Containers: Open Folder in Container...`
+    1. Your dev environment is ready to go!... and it's running in a container :+1:
+
+    </p></details>
+
+    <details><summary>Locally</summary><p>
+
+    Install [Go](https://golang.org/dl/), [Docker](https://www.docker.com/products/docker-desktop) and [Git](https://git-scm.com/downloads); then:
+
+    ```sh
+    go get github.com/golang/mock/gomock
+    go get github.com/golang/mock/mockgen
+    ```
+
+    And finally install [golangci-lint](https://github.com/golangci/golangci-lint#install)
+
+    </p></details>
+
+1. Commands available:
+
+    ```sh
+    # Build the binary
+    go build cmd/app/main.go
+    # Test the code
+    go test ./...
+    # Lint the code
+    golangci-lint run
+    # Build the Docker image
+    docker build -t qmcgaw/REPONAME_DOCKER .
+    ```
+
+1. See [Contributing](.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
 
 ## TODOs
 
