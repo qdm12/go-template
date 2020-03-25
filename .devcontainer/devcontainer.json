@@ -46,6 +46,8 @@
         "go.lintFlags": [
             "--fast",
             "--enable",
+            "rowserrcheck",
+            "--enable",
             "bodyclose",
             "--enable",
             "dogsled",
