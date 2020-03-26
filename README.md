@@ -59,8 +59,6 @@
 
 ## Development
 
-## Development
-
 1. Setup your environment
 
     <details><summary>Using VSCode and Docker</summary><p>
@@ -79,6 +77,7 @@
     Install [Go](https://golang.org/dl/), [Docker](https://www.docker.com/products/docker-desktop) and [Git](https://git-scm.com/downloads); then:
 
     ```sh
+    go mod download
     go get github.com/golang/mock/gomock
     go get github.com/golang/mock/mockgen
     ```
