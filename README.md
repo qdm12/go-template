@@ -2,7 +2,7 @@
 
 *SHORT_DESCRIPTION*
 
-<img height="200" src="title.svg?sanitize=true">
+<img height="200" src="https://raw.githubusercontent.com/qdm12/REPONAME_GITHUB/master/title.svg?sanitize=true">
 
 [![Build status](https://github.com/qdm12/REPONAME_GITHUB/workflows/Buildx%20latest/badge.svg)](https://github.com/qdm12/REPONAME_GITHUB/actions?query=workflow%3A%22Buildx+latest%22)
 [![Docker Pulls](https://img.shields.io/docker/pulls/qmcgaw/REPONAME_DOCKER.svg)](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER)
@@ -11,8 +11,8 @@
 [![Image version](https://images.microbadger.com/badges/version/qmcgaw/REPONAME_DOCKER.svg)](https://microbadger.com/images/qmcgaw/REPONAME_DOCKER)
 
 [![Join Slack channel](https://img.shields.io/badge/slack-@qdm12-yellow.svg?logo=slack)](https://join.slack.com/t/qdm12/shared_invite/enQtOTE0NjcxNTM1ODc5LTYyZmVlOTM3MGI4ZWU0YmJkMjUxNmQ4ODQ2OTAwYzMxMTlhY2Q1MWQyOWUyNjc2ODliNjFjMDUxNWNmNzk5MDk)
-[![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/issues)
-[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/commits/master)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/graphs/contributors)
 [![GitHub issues](https://img.shields.io/github/issues/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/issues)
 
 ## Features
