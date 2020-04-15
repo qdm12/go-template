@@ -3,12 +3,18 @@ on:
   push:
     branches: [master]
     paths-ignore:
+      - .devcontainer
+      - .github/workflows/build-pr.yml
+      - .github/workflows/buildx-latest.yml
       - .github/workflows/buildx-release.yml
       - .github/workflows/dockerhub-description.yml
       - .github/workflows/labels.yml
       - .github/workflows/misspell.yml
-      - .github/workflows/security.yml
-      - .dockerignore
+      - .github/CODEOWNERS
+      - .github/CONTRIBUTING.md
+      - .github/FUNDING.yml
+      - .github/labels.yml
+      - .vscode
       - .gitignore
       - docker-compose.yml
       - LICENSE
@@ -17,19 +23,25 @@ on:
   pull_request:
     branches: [master]
     paths-ignore:
+      - .devcontainer
+      - .github/workflows/build-pr.yml
+      - .github/workflows/buildx-latest.yml
       - .github/workflows/buildx-release.yml
       - .github/workflows/dockerhub-description.yml
       - .github/workflows/labels.yml
       - .github/workflows/misspell.yml
-      - .github/workflows/security.yml
-      - .dockerignore
+      - .github/CODEOWNERS
+      - .github/CONTRIBUTING.md
+      - .github/FUNDING.yml
+      - .github/labels.yml
+      - .vscode
       - .gitignore
       - docker-compose.yml
       - LICENSE
       - README.md
       - title.svg
   schedule:
-    - cron: '0 9 * * *'
+    - cron: "0 9 * * *"
 jobs:
   security-analysis:
     runs-on: ubuntu-latest
