@@ -5,7 +5,6 @@ on:
     paths-ignore:
       - .github/workflows/buildx-release.yml
       - .github/workflows/dockerhub-description.yml
-      - .github/workflows/greetings.yml
       - .github/workflows/labels.yml
       - .github/workflows/misspell.yml
       - .github/workflows/security.yml
@@ -20,7 +19,6 @@ on:
     paths-ignore:
       - .github/workflows/buildx-release.yml
       - .github/workflows/dockerhub-description.yml
-      - .github/workflows/greetings.yml
       - .github/workflows/labels.yml
       - .github/workflows/misspell.yml
       - .github/workflows/security.yml
