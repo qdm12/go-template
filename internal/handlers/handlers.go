@@ -10,48 +10,37 @@ import (
 	"github.com/qdm12/golibs/server"
 )
 
-// Handler contains a handler function
-type Handler interface {
-	GetHandlerFunc() http.HandlerFunc
-}
-
 type handler struct {
-	rootURL string
-	proc    processor.Processor
-	logger  logging.Logger
+	logger logging.Logger
+	proc   processor.Processor
 }
 
-// NewHandler returns a Handler object
-func NewHandler(rootURL string, proc processor.Processor, logger logging.Logger) Handler {
-	return &handler{
-		rootURL: rootURL,
-		proc:    proc,
-		logger:  logger,
+func NewHandler(rootURL string, proc processor.Processor, logger logging.Logger) http.HandlerFunc {
+	h := &handler{
+		proc:   proc,
+		logger: logger,
 	}
-}
-
-// GetHandlerFunc returns a router with all the necessary routes configured
-func (h *handler) GetHandlerFunc() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// SOAP like api
 		if r.Method != http.MethodPost {
 			h.respondError(w, errors.NewBadRequest("HTTP method must be POST"))
 			return
 		}
 		decoder := json.NewDecoder(r.Body)
 		var body struct {
-			Target string `json:"target"`
+			Command string `json:"command"`
 		}
 		if err := decoder.Decode(&body); err != nil {
 			h.respondError(w, errors.NewBadRequest(err))
 			return
 		}
-		switch body.Target {
+		switch body.Command {
 		case "get user by id":
 			h.getUserByID(w, r)
 		case "create user":
 			h.createUser(w, r)
 		default:
-			h.respondError(w, errors.NewBadRequest("target %q is invalid", body.Target))
+			h.respondError(w, errors.NewBadRequest("command %q is invalid", body.Command))
 		}
 	}
 }
