@@ -36,21 +36,15 @@ LABEL \
 COPY --from=alpine --chown=1000 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=alpine --chown=1000 /usr/share/zoneinfo /usr/share/zoneinfo
 ENV TZ=America/Montreal \
-    HTTP_TIMEOUT=3000 \
-    LOG_ENCODING=json \
+    LOG_ENCODING=console \
     LOG_LEVEL=info \
-    NODE_ID=0 \
+    NODE_ID=-1 \
     LISTENING_PORT=8000 \
     ROOT_URL=/ \
     SQL_HOST=postgres \
     SQL_USER=postgres \
     SQL_PASSWORD=postgres \
-    SQL_DBNAME=postgres \
-    REDIS_HOST=redis \
-    REDIS_PORT=6379 \
-    REDIS_PASSWORD= \
-    GOTIFY_URL= \
-    GOTIFY_TOKEN=
+    SQL_DBNAME=postgres
 ENTRYPOINT ["/app"]
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=2 CMD ["/app","healthcheck"]
 USER 1000

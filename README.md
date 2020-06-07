@@ -40,21 +40,15 @@
 
 | Environment variable | Default | Possible values | Description |
 | --- | --- | --- | --- |
-| `HTTP_TIMEOUT` | `3000` | Integer from 1 | Default HTTP client timeout in milliseconds |
-| `LOG_ENCODING` | `json` | `json`, `console` | Logging format |
+| `LOG_ENCODING` | `console` | `json`, `console` | Logging format |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warning`, `error` | Logging level |
-| `NODE_ID` | `0` | Integer | Node ID for clusters |
+| `NODE_ID` | `-1` | Integer | Node ID for clusters |
 | `LISTENING_PORT` | `8000` | Integer between `1` and `65535` | Internal listening TCP port |
 | `ROOT_URL` | `/` | URL path *string* | URL path, used if behind a reverse proxy |
 | `SQL_HOST` | `postgres` | *string* | Database hostname |
 | `SQL_USER` | `postgres` | *string* | Database user |
 | `SQL_PASSWORD` | `postgres` | *string* | Database password |
 | `SQL_DBNAME` | `postgres` | *string* | Database name |
-| `REDIS_HOST` | `redis` | *string* | Redis hostname |
-| `REDIS_PORT` | `6379` | Integer between `1` and `65535` | Redis listening TCP port |
-| `REDIS_PASSWORD` | | *string* | Redis password if needed |
-| `GOTIFY_URL` | | URL *string* | URL to Gotify server |
-| `GOTIFY_TOKEN` | | *string* | Token for Gotify server |
 | `TZ` | `America/Montreal` | *string* | Timezone |
 
 ## Development
