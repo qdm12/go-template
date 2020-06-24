@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -11,7 +12,6 @@ import (
 	"github.com/qdm12/golibs/healthcheck"
 	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/golibs/server"
-	"golang.org/x/net/context"
 
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
 	"github.com/qdm12/REPONAME_GITHUB/internal/handlers"
