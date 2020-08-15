@@ -17,16 +17,23 @@ COPY cmd/app/main.go cmd/app/main.go
 COPY internal ./internal
 RUN go test ./...
 RUN golangci-lint run --timeout=10m
-RUN go build -ldflags="-s -w" -o app cmd/app/main.go
-
-FROM scratch
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
+RUN go build -o app -trimpath -ldflags="-s -w \
+    -X 'main.BuildDate=$BUILD_DATE' \
+    -X 'main.VcsRef=$VCS_REF' \
+    -X 'main.Version=$VERSION'" \
+    cmd/app/main.go
+
+FROM scratch
+ARG VERSION
+ARG BUILD_DATE
+ARG VCS_REF
 LABEL \
     org.opencontainers.image.authors="quentin.mcgaw@gmail.com" \
-    org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.version=$VERSION \
+    org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.revision=$VCS_REF \
     org.opencontainers.image.url="https://github.com/qdm12/REPONAME_GITHUB" \
     org.opencontainers.image.documentation="https://github.com/qdm12/REPONAME_GITHUB/blob/master/README.md" \

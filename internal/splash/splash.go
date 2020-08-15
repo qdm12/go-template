@@ -10,7 +10,7 @@ import (
 )
 
 // Splash returns the welcome spash message
-func Splash(version, vcsRef, buildDate string) string {
+func Splash(version, buildDate, vcsRef string) string {
 	lines := title()
 	lines = append(lines, "")
 	lines = append(lines, fmt.Sprintf("Running version %s built on %s (commit %s)", version, buildDate, vcsRef))

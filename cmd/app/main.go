@@ -20,6 +20,13 @@ import (
 	"github.com/qdm12/REPONAME_GITHUB/internal/splash"
 )
 
+//nolint: gochecknoglobals
+var (
+	BuildDate = "unknown date"
+	VcsRef    = "unknown ref"
+	Version   = "unknown version"
+)
+
 func main() {
 	ctx := context.Background()
 	os.Exit(_main(ctx))
@@ -39,10 +46,7 @@ func _main(ctx context.Context) int {
 		return 0
 	}
 	paramsReader := params.NewReader()
-	fmt.Println(splash.Splash(
-		paramsReader.GetVersion(),
-		paramsReader.GetVcsRef(),
-		paramsReader.GetBuildDate()))
+	fmt.Println(splash.Splash(Version, BuildDate, VcsRef))
 	logger, err := createLogger(paramsReader)
 	if err != nil {
 		fmt.Println(err)
