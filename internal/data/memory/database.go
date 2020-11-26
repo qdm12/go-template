@@ -6,13 +6,13 @@ import (
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 )
 
-// Database is the JSON file implementation of the database store
+// Database is the JSON file implementation of the database store.
 type Database struct {
 	sync.RWMutex
 	data models.Data
 }
 
-// NewDatabase creates an empty memory based database
+// NewDatabase creates an empty memory based database.
 func NewDatabase() (*Database, error) {
 	return &Database{}, nil
 }

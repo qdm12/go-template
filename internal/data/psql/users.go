@@ -7,7 +7,7 @@ import (
 	"github.com/qdm12/golibs/errors"
 )
 
-// CreateUser inserts a user in the datatabase
+// CreateUser inserts a user in the database.
 func (db *Database) CreateUser(user models.User) (err error) {
 	_, err = db.sql.Exec(
 		"INSERT INTO users(id, account, username, email) VALUES ($1,$2,$3,$4);",
@@ -22,7 +22,7 @@ func (db *Database) CreateUser(user models.User) (err error) {
 	return nil
 }
 
-// GetUserByID returns the user corresponding to a user ID from the database
+// GetUserByID returns the user corresponding to a user ID from the database.
 func (db *Database) GetUserByID(id uint64) (user models.User, err error) {
 	row := db.sql.QueryRow(
 		"SELECT account, email, username FROM users WHERE id = $1;",

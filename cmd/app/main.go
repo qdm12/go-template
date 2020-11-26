@@ -8,16 +8,15 @@ import (
 	"syscall"
 
 	_ "github.com/lib/pq"
-	"github.com/qdm12/golibs/crypto"
-	"github.com/qdm12/golibs/healthcheck"
-	"github.com/qdm12/golibs/logging"
-	"github.com/qdm12/golibs/server"
-
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
 	"github.com/qdm12/REPONAME_GITHUB/internal/handlers"
 	"github.com/qdm12/REPONAME_GITHUB/internal/params"
 	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
 	"github.com/qdm12/REPONAME_GITHUB/internal/splash"
+	"github.com/qdm12/golibs/crypto"
+	"github.com/qdm12/golibs/healthcheck"
+	"github.com/qdm12/golibs/logging"
+	"github.com/qdm12/golibs/server"
 )
 
 //nolint: gochecknoglobals
@@ -100,7 +99,7 @@ func _main(ctx context.Context) int {
 	case signal := <-osSignals:
 		message := fmt.Sprintf("Stopping program: caught OS signal %q", signal)
 		logger.Warn(message)
-		return 2
+		return 1
 	case <-ctx.Done():
 		message := fmt.Sprintf("Stopping program: %s", ctx.Err())
 		logger.Warn(message)

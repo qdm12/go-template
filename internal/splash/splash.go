@@ -9,7 +9,7 @@ import (
 	"github.com/qdm12/REPONAME_GITHUB/internal/constants"
 )
 
-// Splash returns the welcome spash message
+// Splash returns the welcome spash message.
 func Splash(version, buildDate, vcsRef string) string {
 	lines := title()
 	lines = append(lines, "")

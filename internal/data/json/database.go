@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/qdm12/golibs/files"
-
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/memory"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/golibs/files"
 )
 
-// Database is the JSON file implementation of the database store
+// Database is the JSON file implementation of the database store.
 type Database struct {
 	sync.Mutex
 	memory      *memory.Database
@@ -20,7 +19,7 @@ type Database struct {
 }
 
 // NewDatabase creates a JSON file at the filepath provided if needed,
-// and reads existing data in memory
+// and reads existing data in memory.
 func NewDatabase(memory *memory.Database, filepath string) (*Database, error) {
 	const errorWrapper = "cannot create JSON database"
 	db := Database{
@@ -70,7 +69,7 @@ func (db *Database) writeFile() error {
 	return nil
 }
 
-// readFile only used when creating database
+// readFile only used when creating database.
 func (db *Database) readFile() error {
 	b, err := db.fileManager.ReadFile(db.filepath)
 	if err != nil {
