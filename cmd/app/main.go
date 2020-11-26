@@ -39,7 +39,7 @@ func _main(ctx context.Context) int {
 		// Running the program in a separate instance through the Docker
 		// built-in healthcheck, in an ephemeral fashion to query the
 		// long running instance of the program about its status
-		if err := healthcheck.Query(); err != nil {
+		if err := healthcheck.Query(ctx); err != nil {
 			fmt.Println(err)
 			return 1
 		}
@@ -80,7 +80,7 @@ func _main(ctx context.Context) int {
 	serverErrors := make(chan []error)
 	go func() {
 		serverErrors <- server.RunServers(ctx,
-			server.Settings{Name: "production", Addr: "0.0.0.0:" + listeningPort, Handler: productionHandlerFunc},
+			server.Settings{Name: "production", Addr: fmt.Sprintf("0.0.0.0:%d", listeningPort), Handler: productionHandlerFunc},
 			server.Settings{Name: "healthcheck", Addr: "127.0.0.1:9999", Handler: healthcheckHandlerFunc},
 		)
 	}()
@@ -109,11 +109,11 @@ func _main(ctx context.Context) int {
 }
 
 func createLogger(paramsReader params.Reader) (logger logging.Logger, err error) {
-	encoding, level, nodeID, err := paramsReader.GetLoggerConfig()
+	encoding, level, err := paramsReader.GetLoggerConfig()
 	if err != nil {
 		return nil, err
 	}
-	return logging.NewLogger(encoding, level, nodeID)
+	return logging.NewLogger(encoding, level)
 }
 
 func setupDatabase(paramsReader params.Reader, logger logging.Logger) (db data.Database, err error) {

@@ -6,8 +6,8 @@ import (
 )
 
 type Reader interface {
-	GetListeningPort() (listeningPort, warning string, err error)
-	GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error)
+	GetListeningPort() (listeningPort uint16, warning string, err error)
+	GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error)
 	GetRootURL(setters ...libparams.GetEnvSetter) (rootURL string, err error)
 	GetDatabaseDetails() (hostname, user, password, dbName string, err error)
 }
@@ -22,11 +22,11 @@ func NewReader() Reader {
 	}
 }
 
-func (r *reader) GetListeningPort() (listeningPort, warning string, err error) {
-	return r.envParams.GetListeningPort()
+func (r *reader) GetListeningPort() (listeningPort uint16, warning string, err error) {
+	return r.envParams.GetListeningPort("LISTENING_PORT")
 }
 
-func (r *reader) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, nodeID int, err error) {
+func (r *reader) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error) {
 	return r.envParams.GetLoggerConfig()
 }
 
