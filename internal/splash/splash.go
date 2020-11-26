@@ -7,15 +7,17 @@ import (
 
 	"github.com/kyokomi/emoji"
 	"github.com/qdm12/REPONAME_GITHUB/internal/constants"
+	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 )
 
 // Splash returns the welcome spash message.
-func Splash(version, buildDate, vcsRef string) string {
+func Splash(buildInfo models.BuildInformation) string {
 	lines := title()
 	lines = append(lines, "")
-	lines = append(lines, fmt.Sprintf("Running version %s built on %s (commit %s)", version, buildDate, vcsRef))
+	lines = append(lines, fmt.Sprintf("Running version %s built on %s (commit %s)",
+		buildInfo.Version, buildInfo.BuildDate, buildInfo.Commit))
 	lines = append(lines, "")
-	lines = append(lines, annoucement()...)
+	lines = append(lines, announcement()...)
 	lines = append(lines, "")
 	lines = append(lines, links()...)
 	return strings.Join(lines, "\n")
@@ -32,7 +34,7 @@ func title() []string {
 	}
 }
 
-func annoucement() []string {
+func announcement() []string {
 	if len(constants.Annoucement) == 0 {
 		return nil
 	}

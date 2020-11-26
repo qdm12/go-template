@@ -17,24 +17,24 @@ COPY cmd/app/main.go cmd/app/main.go
 COPY internal ./internal
 RUN go test ./...
 RUN golangci-lint run --timeout=10m
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
+ARG VERSION=unknown
+ARG BUILD_DATE="an unknown date"
+ARG COMMIT=unknown
 RUN go build -o app -trimpath -ldflags="-s -w \
-    -X 'main.BuildDate=$BUILD_DATE' \
-    -X 'main.VcsRef=$VCS_REF' \
-    -X 'main.Version=$VERSION'" \
+    -X 'main.version=$VERSION' \
+    -X 'main.buildDate=$BUILD_DATE' \
+    -X 'main.commit=$COMMIT'" \
     cmd/app/main.go
 
 FROM scratch
-ARG VERSION
-ARG BUILD_DATE
-ARG VCS_REF
+ARG VERSION=unknown
+ARG BUILD_DATE="an unknown date"
+ARG COMMIT=unknown
 LABEL \
     org.opencontainers.image.authors="quentin.mcgaw@gmail.com" \
     org.opencontainers.image.version=$VERSION \
     org.opencontainers.image.created=$BUILD_DATE \
-    org.opencontainers.image.revision=$VCS_REF \
+    org.opencontainers.image.revision=$COMMIT \
     org.opencontainers.image.url="https://github.com/qdm12/REPONAME_GITHUB" \
     org.opencontainers.image.documentation="https://github.com/qdm12/REPONAME_GITHUB/blob/master/README.md" \
     org.opencontainers.image.source="https://github.com/qdm12/REPONAME_GITHUB" \

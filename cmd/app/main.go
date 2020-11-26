@@ -10,6 +10,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
 	"github.com/qdm12/REPONAME_GITHUB/internal/handlers"
+	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 	"github.com/qdm12/REPONAME_GITHUB/internal/params"
 	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
 	"github.com/qdm12/REPONAME_GITHUB/internal/splash"
@@ -19,19 +20,23 @@ import (
 	"github.com/qdm12/golibs/server"
 )
 
-//nolint: gochecknoglobals
+//nolint:gochecknoglobals
 var (
-	BuildDate = "unknown date"
-	VcsRef    = "unknown ref"
-	Version   = "unknown version"
+	buildInfo models.BuildInformation
+	version   = "unknown"
+	commit    = "unknown"
+	buildDate = "an unknown date"
 )
 
 func main() {
+	buildInfo.Version = version
+	buildInfo.Commit = commit
+	buildInfo.BuildDate = buildDate
 	ctx := context.Background()
-	os.Exit(_main(ctx))
+	os.Exit(_main(ctx, os.Args))
 }
 
-func _main(ctx context.Context) int {
+func _main(ctx context.Context, _ []string) int {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if healthcheck.Mode(os.Args) {
@@ -45,7 +50,7 @@ func _main(ctx context.Context) int {
 		return 0
 	}
 	paramsReader := params.NewReader()
-	fmt.Println(splash.Splash(Version, BuildDate, VcsRef))
+	fmt.Println(splash.Splash(buildInfo))
 	logger, err := createLogger(paramsReader)
 	if err != nil {
 		fmt.Println(err)
