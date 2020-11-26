@@ -4,33 +4,53 @@ linters-settings:
   misspell:
     locale: US
 
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+        - maligned
+
 linters:
   disable-all: true
   enable:
+    - asciicheck
     - bodyclose
     - deadcode
     - dogsled
     - dupl
     - errcheck
+    - exhaustive
+    - exportloopref
+    - gci
     - gochecknoglobals
     - gochecknoinits
     - gocognit
     - goconst
     - gocritic
     - gocyclo
+    - godot
+    - goheader
     - goimports
     - golint
+    - gomnd
+    - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
     - interfacer
+    - lll
     - maligned
     - misspell
     - nakedret
+    - nestif
+    - noctx
+    - nolintlint
     - prealloc
     - rowserrcheck
     - scopelint
+    - sqlclosecheck
     - staticcheck
     - structcheck
     - typecheck
@@ -45,6 +65,3 @@ run:
     - .devcontainer
     - .github
     - postgres
-
-service:
-  golangci-lint-version: 1.30.x # use the fixed version to not introduce new linters unexpectedly
