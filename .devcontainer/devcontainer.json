@@ -32,13 +32,10 @@
         // "spikespaz.vscode-smoothtype", // smooth cursor animation
     ],
     "settings": {
-        // General settings
         "files.eol": "\n",
-        // Docker
         "remote.extensionKind": {
             "ms-azuretools.vscode-docker": "workspace"
         },
-        // Golang general settings
         "go.useLanguageServer": true,
         "go.autocompleteUnimportedPackages": true,
         "go.gotoSymbol.includeImports": true,
@@ -58,7 +55,6 @@
                 "source.organizeImports": true
             }
         },
-        // Golang testing
         "go.toolsEnvVars": {
             "GOFLAGS": "-tags=",
             "CGO_ENABLED": 1 // for the race detector
