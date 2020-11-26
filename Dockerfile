@@ -5,14 +5,14 @@ FROM alpine:${ALPINE_VERSION} AS alpine
 RUN apk --update add ca-certificates tzdata
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS builder
-ARG GOLANGCI_LINT_VERSION=v1.30.0
+ARG GOLANGCI_LINT_VERSION=v1.33.0
 RUN apk --update add git
 ENV CGO_ENABLED=0
 RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s ${GOLANGCI_LINT_VERSION}
 WORKDIR /tmp/gobuild
-COPY .golangci.yml .
 COPY go.mod go.sum ./
 RUN go mod download 2>&1
+COPY .golangci.yml .
 COPY cmd/app/main.go cmd/app/main.go
 COPY internal ./internal
 RUN go test ./...
@@ -45,7 +45,6 @@ COPY --from=alpine --chown=1000 /usr/share/zoneinfo /usr/share/zoneinfo
 ENV TZ=America/Montreal \
     LOG_ENCODING=console \
     LOG_LEVEL=info \
-    NODE_ID=-1 \
     LISTENING_PORT=8000 \
     ROOT_URL=/ \
     SQL_HOST=postgres \
