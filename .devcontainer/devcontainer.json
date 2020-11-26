@@ -54,15 +54,16 @@
         },
         // Golang testing
         "go.toolsEnvVars": {
-            "GOFLAGS": "-tags="
+            "GOFLAGS": "-tags=",
+            "CGO_ENABLED": 1 // for the race detector
         },
         "gopls.env": {
             "GOFLAGS": "-tags="
         },
         "go.testEnvVars": {},
-        "go.testFlags": [
-            "-v"
-        ],
-        "go.testTimeout": "600s"
+        "go.testFlags": ["-v", "-race"],
+        "go.testTimeout": "10s",
+        "go.coverOnSingleTest": true,
+        "go.coverOnSingleTestFile": true,
     }
 }
