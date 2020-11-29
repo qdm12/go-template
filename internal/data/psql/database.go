@@ -2,8 +2,10 @@ package psql
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
+	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
 	"github.com/qdm12/golibs/crypto/random"
 	"github.com/qdm12/golibs/logging"
 )
@@ -20,7 +22,7 @@ func NewDatabase(host, user, password, database string, logger logging.Logger) (
 	connStr := "postgres://" + user + ":" + password + "@" + host + "/" + database + "?sslmode=disable&connect_timeout=1"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
 	}
 	fails := 0
 	const maxFails = 3
@@ -32,7 +34,7 @@ func NewDatabase(host, user, password, database string, logger logging.Logger) (
 		}
 		fails++
 		if fails == maxFails {
-			return nil, err
+			return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
 		}
 		time.Sleep(sleepDuration)
 	}
@@ -41,7 +43,10 @@ func NewDatabase(host, user, password, database string, logger logging.Logger) (
 
 // Close closes the database and prevents new queries from starting.
 func (db *Database) Close() error {
-	return db.sql.Close()
+	if err := db.sql.Close(); err != nil {
+		return fmt.Errorf("%w: %s", errors.ErrClose, err)
+	}
+	return nil
 }
 
 // PeriodicHealthcheck pings the database periodically and runs onFailure if an error occurs.

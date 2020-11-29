@@ -2,9 +2,10 @@ package psql
 
 import (
 	"database/sql"
+	"fmt"
 
+	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
-	"github.com/qdm12/golibs/errors"
 )
 
 // CreateUser inserts a user in the database.
@@ -17,7 +18,7 @@ func (db *Database) CreateUser(user models.User) (err error) {
 		user.Email,
 	)
 	if err != nil {
-		return errors.NewInternal("CreateUser: %s", err)
+		return fmt.Errorf("%w: %s", errors.ErrCreateUser, err)
 	}
 	return nil
 }
@@ -31,9 +32,9 @@ func (db *Database) GetUserByID(id uint64) (user models.User, err error) {
 	user.ID = id
 	err = row.Scan(&user.Account, &user.Email, &user.Username)
 	if err == sql.ErrNoRows {
-		return user, errors.NewNotFound("no user found for id %d", id)
+		return user, fmt.Errorf("%w: for id %d", errors.ErrUserNotFound, id)
 	} else if err != nil {
-		return user, errors.NewInternal("GetUserByID for id %d: %s", id, err)
+		return user, fmt.Errorf("%w: for id %d: %s", errors.ErrGetUser, id, err)
 	}
 	return user, nil
 }

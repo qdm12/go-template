@@ -1,8 +1,10 @@
 package json
 
 import (
+	"fmt"
+
+	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
-	"github.com/qdm12/golibs/errors"
 )
 
 func (db *Database) CreateUser(user models.User) (err error) {
@@ -10,7 +12,7 @@ func (db *Database) CreateUser(user models.User) (err error) {
 		return err
 	}
 	if err := db.writeFile(); err != nil {
-		return errors.NewInternal("CreateUser for %#v: %s", user, err)
+		return fmt.Errorf("%w: for user %#v: %s", errors.ErrCreateUser, user, err)
 	}
 	return nil
 }

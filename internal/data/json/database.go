@@ -1,10 +1,11 @@
 package json
 
 import (
-	libjson "encoding/json"
+	"encoding/json"
 	"fmt"
 	"sync"
 
+	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/memory"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 	"github.com/qdm12/golibs/files"
@@ -21,28 +22,27 @@ type Database struct {
 // NewDatabase creates a JSON file at the filepath provided if needed,
 // and reads existing data in memory.
 func NewDatabase(memory *memory.Database, filepath string) (*Database, error) {
-	const errorWrapper = "cannot create JSON database"
 	db := Database{
 		memory:      memory,
 		filepath:    filepath,
 		fileManager: files.NewFileManager()}
 	exists, err := db.fileManager.FileExists(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %s", errorWrapper, err)
+		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
 	} else if !exists {
 		if err := db.fileManager.Touch(filepath); err != nil {
-			return nil, fmt.Errorf("%s: %s", errorWrapper, err)
+			return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
 		}
 	}
 	rawData, err := db.fileManager.ReadFile(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %s", errorWrapper, err)
+		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
 	} else if len(rawData) == 0 {
 		if err := db.writeFile(); err != nil {
-			return nil, fmt.Errorf("%s: %s", errorWrapper, err)
+			return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
 		}
 	} else if err := db.readFile(); err != nil {
-		return nil, fmt.Errorf("%s: %s", errorWrapper, err)
+		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
 	}
 	return &db, nil
 }
@@ -59,25 +59,25 @@ func (db *Database) Close() error {
 func (db *Database) writeFile() error {
 	db.Lock()
 	defer db.Unlock()
-	b, err := libjson.Marshal(db.memory.GetData())
+	b, err := json.Marshal(db.memory.GetData())
 	if err != nil {
-		return fmt.Errorf("cannot write data to JSON file: %s", err)
+		return fmt.Errorf("%w: %s", errors.ErrWriteFile, err)
 	}
 	if err := db.fileManager.WriteToFile(db.filepath, b); err != nil {
-		return fmt.Errorf("cannot write data to JSON file: %s", err)
+		return fmt.Errorf("%w: %s", errors.ErrWriteFile, err)
 	}
 	return nil
 }
 
-// readFile only used when creating database.
+// readFile is only used when creating the database.
 func (db *Database) readFile() error {
 	b, err := db.fileManager.ReadFile(db.filepath)
 	if err != nil {
-		return fmt.Errorf("cannot read JSON file: %s", err)
+		return fmt.Errorf("%w: %s", errors.ErrReadFile, err)
 	}
 	var data models.Data
-	if err := libjson.Unmarshal(b, &data); err != nil {
-		return fmt.Errorf("cannot read JSON file: %s", err)
+	if err := json.Unmarshal(b, &data); err != nil {
+		return fmt.Errorf("%w: %s", errors.ErrReadFile, err)
 	}
 	db.memory.SetData(data)
 	return nil

@@ -9,9 +9,5 @@ func (p *processor) CreateUser(user models.User) error {
 }
 
 func (p *processor) GetUserByID(id uint64) (user models.User, err error) {
-	user, err = p.db.GetUserByID(id)
-	if err != nil {
-		return user, err
-	}
-	return user, nil
+	return p.db.GetUserByID(id)
 }

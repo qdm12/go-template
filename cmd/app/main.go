@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	_ "github.com/lib/pq"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
-	"github.com/qdm12/REPONAME_GITHUB/internal/handlers"
+	"github.com/qdm12/REPONAME_GITHUB/internal/health"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 	"github.com/qdm12/REPONAME_GITHUB/internal/params"
 	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
+	"github.com/qdm12/REPONAME_GITHUB/internal/server"
 	"github.com/qdm12/REPONAME_GITHUB/internal/splash"
 	"github.com/qdm12/golibs/crypto"
-	"github.com/qdm12/golibs/healthcheck"
 	"github.com/qdm12/golibs/logging"
-	"github.com/qdm12/golibs/server"
 )
 
 //nolint:gochecknoglobals
@@ -39,11 +39,12 @@ func main() {
 func _main(ctx context.Context, _ []string) int {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	if healthcheck.Mode(os.Args) {
+	if health.IsClientMode(os.Args) {
 		// Running the program in a separate instance through the Docker
 		// built-in healthcheck, in an ephemeral fashion to query the
 		// long running instance of the program about its status
-		if err := healthcheck.Query(ctx); err != nil {
+		client := health.NewClient()
+		if err := client.Query(ctx); err != nil {
 			fmt.Println(err)
 			return 1
 		}
@@ -76,34 +77,35 @@ func _main(ctx context.Context, _ []string) int {
 	}
 	defer db.Close()
 
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
+
 	crypto := crypto.NewCrypto()
 	proc := processor.NewProcessor(db, crypto)
-	productionHandlerFunc := handlers.NewHandler(rootURL, proc, logger)
-	healthcheckHandlerFunc := healthcheck.GetHandler(func() error { return nil })
-	logger.Info("Server listening at address 0.0.0.0:%s with root URL %s", listeningPort, rootURL)
-	serverErrors := make(chan []error)
-	go func() {
-		serverErrors <- server.RunServers(ctx,
-			server.Settings{Name: "production", Addr: fmt.Sprintf("0.0.0.0:%d", listeningPort), Handler: productionHandlerFunc},
-			server.Settings{Name: "healthcheck", Addr: "127.0.0.1:9999", Handler: healthcheckHandlerFunc},
-		)
-	}()
+
+	serverLogger := logger.WithPrefix("http server: ")
+	address := fmt.Sprintf("0.0.0.0:%d", listeningPort)
+	server := server.New(address, rootURL, serverLogger, buildInfo, proc)
+	wg.Add(1)
+	go server.Run(ctx, wg)
+
+	const healthServerAddr = "127.0.0.1:9999"
+	healthcheck := func() error { return nil }
+	healthServer := health.NewServer(healthServerAddr, logger.WithPrefix("healthcheck server: "), healthcheck)
+	wg.Add(1)
+	go healthServer.Run(ctx, wg)
 
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals,
+		os.Interrupt,
 		syscall.SIGINT,
 		syscall.SIGTERM,
-		os.Interrupt,
 	)
 	select {
-	case errors := <-serverErrors:
-		for _, err := range errors {
-			logger.Error(err)
-		}
-		return 1
 	case signal := <-osSignals:
 		message := fmt.Sprintf("Stopping program: caught OS signal %q", signal)
 		logger.Warn(message)
+		cancel()
 		return 1
 	case <-ctx.Done():
 		message := fmt.Sprintf("Stopping program: %s", ctx.Err())

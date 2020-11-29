@@ -1,8 +1,10 @@
 package memory
 
 import (
+	"fmt"
+
+	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
-	"github.com/qdm12/golibs/errors"
 )
 
 func (db *Database) CreateUser(user models.User) (err error) {
@@ -20,5 +22,5 @@ func (db *Database) GetUserByID(id uint64) (user models.User, err error) {
 			return user, nil
 		}
 	}
-	return user, errors.NewNotFound("user not found for id %d", id)
+	return user, fmt.Errorf("%w: for id %d", errors.ErrUserNotFound, id)
 }
