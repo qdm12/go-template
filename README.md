@@ -42,7 +42,6 @@
 | --- | --- | --- | --- |
 | `LOG_ENCODING` | `console` | `json`, `console` | Logging format |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warning`, `error` | Logging level |
-| `NODE_ID` | `-1` | Integer | Node ID for clusters |
 | `LISTENING_PORT` | `8000` | Integer between `1` and `65535` | Internal listening TCP port |
 | `ROOT_URL` | `/` | URL path *string* | URL path, used if behind a reverse proxy |
 | `SQL_HOST` | `postgres` | *string* | Database hostname |
