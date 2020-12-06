@@ -23,7 +23,7 @@ func NewReader() Reader {
 }
 
 func (r *reader) GetListeningPort() (listeningPort uint16, warning string, err error) {
-	return r.envParams.GetListeningPort("LISTENING_PORT")
+	return r.envParams.GetListeningPort("LISTENING_PORT", libparams.Default("8000"))
 }
 
 func (r *reader) GetLoggerConfig() (encoding logging.Encoding, level logging.Level, err error) {
