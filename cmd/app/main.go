@@ -20,7 +20,6 @@ import (
 	"github.com/qdm12/golibs/logging"
 )
 
-//nolint:gochecknoglobals
 var (
 	version   = "unknown"
 	commit    = "unknown"
