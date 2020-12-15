@@ -22,21 +22,22 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	buildInfo models.BuildInformation
 	version   = "unknown"
 	commit    = "unknown"
 	buildDate = "an unknown date"
 )
 
 func main() {
-	buildInfo.Version = version
-	buildInfo.Commit = commit
-	buildInfo.BuildDate = buildDate
+	buildInfo := models.BuildInformation{
+		Version:   version,
+		Commit:    commit,
+		BuildDate: buildDate,
+	}
 	ctx := context.Background()
-	os.Exit(_main(ctx, os.Args))
+	os.Exit(_main(ctx, os.Args, buildInfo))
 }
 
-func _main(ctx context.Context, _ []string) int {
+func _main(ctx context.Context, _ []string, buildInfo models.BuildInformation) int {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(os.Args) {
