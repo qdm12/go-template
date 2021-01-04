@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
@@ -32,11 +33,64 @@ func main() {
 		Commit:    commit,
 		BuildDate: buildDate,
 	}
+
 	ctx := context.Background()
-	os.Exit(_main(ctx, os.Args, buildInfo))
+	ctx, cancel := context.WithCancel(ctx)
+
+	paramsReader := params.NewReader()
+
+	encoding, level, err := paramsReader.GetLoggerConfig()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	logger, err := logging.NewLogger(encoding, level)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	args := os.Args
+
+	errorCh := make(chan error)
+	go func() {
+		errorCh <- _main(ctx, buildInfo, args, logger, paramsReader)
+	}()
+
+	signalsCh := make(chan os.Signal, 1)
+	signal.Notify(signalsCh,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		os.Interrupt,
+	)
+
+	select {
+	case signal := <-signalsCh:
+		logger.Warn("Caught OS signal %s, shutting down", signal)
+	case err := <-errorCh:
+		logger.Error(err)
+		close(errorCh)
+	}
+
+	cancel()
+
+	const shutdownGracePeriod = 5 * time.Second
+	timer := time.NewTimer(shutdownGracePeriod)
+	select {
+	case <-errorCh:
+		if !timer.Stop() {
+			<-timer.C
+		}
+		logger.Info("Shutdown successful")
+	case <-timer.C:
+		logger.Warn("Shutdown timed out")
+	}
+
+	os.Exit(1)
 }
 
-func _main(ctx context.Context, _ []string, buildInfo models.BuildInformation) int {
+func _main(ctx context.Context, buildInfo models.BuildInformation,
+	_ []string, logger logging.Logger, paramsReader params.Reader) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(os.Args) {
@@ -45,35 +99,26 @@ func _main(ctx context.Context, _ []string, buildInfo models.BuildInformation) i
 		// long running instance of the program about its status
 		client := health.NewClient()
 		if err := client.Query(ctx); err != nil {
-			fmt.Println(err)
-			return 1
+			return err
 		}
-		return 0
+		return nil
 	}
-	paramsReader := params.NewReader()
+
 	fmt.Println(splash.Splash(buildInfo))
-	logger, err := createLogger(paramsReader)
-	if err != nil {
-		fmt.Println(err)
-		return 1
-	}
 	listeningPort, warning, err := paramsReader.GetListeningPort()
 	if len(warning) > 0 {
 		logger.Warn(warning)
 	}
 	if err != nil {
-		logger.Error(err)
-		return 1
+		return err
 	}
 	rootURL, err := paramsReader.GetRootURL()
 	if err != nil {
-		logger.Error(err)
-		return 1
+		return err
 	}
 	db, err := setupDatabase(paramsReader, logger)
 	if err != nil {
-		logger.Error(err)
-		return 1
+		return err
 	}
 	defer db.Close()
 
@@ -95,31 +140,8 @@ func _main(ctx context.Context, _ []string, buildInfo models.BuildInformation) i
 	wg.Add(1)
 	go healthServer.Run(ctx, wg)
 
-	osSignals := make(chan os.Signal, 1)
-	signal.Notify(osSignals,
-		os.Interrupt,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-	)
-	select {
-	case signal := <-osSignals:
-		message := fmt.Sprintf("Stopping program: caught OS signal %q", signal)
-		logger.Warn(message)
-		cancel()
-		return 1
-	case <-ctx.Done():
-		message := fmt.Sprintf("Stopping program: %s", ctx.Err())
-		logger.Warn(message)
-		return 1
-	}
-}
-
-func createLogger(paramsReader params.Reader) (logger logging.Logger, err error) {
-	encoding, level, err := paramsReader.GetLoggerConfig()
-	if err != nil {
-		return nil, err
-	}
-	return logging.NewLogger(encoding, level)
+	<-ctx.Done()
+	return nil
 }
 
 func setupDatabase(paramsReader params.Reader, logger logging.Logger) (db data.Database, err error) {
