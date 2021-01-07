@@ -13,6 +13,18 @@ services:
       - postgres_password
     restart: always
 
+  postgres:
+    image: postgres:13-alpine
+    volumes:
+      - REPONAME_DOCKER:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: REPONAME_DOCKER
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_user
+      - postgres_password
+
 secrets:
   postgres_user:
     file: ./postgres_user
