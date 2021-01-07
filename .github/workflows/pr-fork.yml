@@ -1,7 +1,7 @@
 name: Pull request
 on:
   pull_request_target:
-    branches: [master]
+    branches: [main]
     paths:
       - .github/workflows/pr-fork.yml
       - cmd/**

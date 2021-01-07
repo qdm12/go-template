@@ -2,7 +2,7 @@
 
 *SHORT_DESCRIPTION*
 
-<img height="200" src="https://raw.githubusercontent.com/qdm12/REPONAME_GITHUB/master/title.svg?sanitize=true">
+<img height="200" src="https://raw.githubusercontent.com/qdm12/REPONAME_GITHUB/main/title.svg?sanitize=true">
 
 [![Build status](https://github.com/qdm12/REPONAME_GITHUB/workflows/Buildx%20latest/badge.svg)](https://github.com/qdm12/REPONAME_GITHUB/actions?query=workflow%3A%22Buildx+latest%22)
 [![Docker Pulls](https://img.shields.io/docker/pulls/qmcgaw/REPONAME_DOCKER.svg)](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER)
@@ -11,7 +11,7 @@
 [![Image version](https://images.microbadger.com/badges/version/qmcgaw/REPONAME_DOCKER.svg)](https://microbadger.com/images/qmcgaw/REPONAME_DOCKER)
 
 [![Join Slack channel](https://img.shields.io/badge/slack-@qdm12-yellow.svg?logo=slack)](https://join.slack.com/t/qdm12/shared_invite/enQtOTE0NjcxNTM1ODc5LTYyZmVlOTM3MGI4ZWU0YmJkMjUxNmQ4ODQ2OTAwYzMxMTlhY2Q1MWQyOWUyNjc2ODliNjFjMDUxNWNmNzk5MDk)
-[![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/commits/master)
+[![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/commits/main)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/graphs/contributors)
 [![GitHub issues](https://img.shields.io/github/issues/qdm12/REPONAME_GITHUB.svg)](https://github.com/qdm12/REPONAME_GITHUB/issues)
 
@@ -28,7 +28,7 @@
     docker run -d qmcgaw/REPONAME_DOCKER
     ```
 
-    You can also use [docker-compose.yml](https://github.com/qdm12/REPONAME_GITHUB/blob/master/docker-compose.yml) with:
+    You can also use [docker-compose.yml](https://github.com/qdm12/REPONAME_GITHUB/blob/main/docker-compose.yml) with:
 
     ```sh
     docker-compose up -d
@@ -75,7 +75,7 @@
         ```
 
     1. Install [golangci-lint](https://github.com/golangci/golangci-lint#install)
-    1. You might want to use an editor such as [Visual Studio Code](https://code.visualstudio.com/download) with the [Go extension](https://code.visualstudio.com/docs/languages/go). Working settings are already in [.vscode/settings.json](https://github.com/qdm12/REPONAME_GITHUB/master/.vscode/settings.json).
+    1. You might want to use an editor such as [Visual Studio Code](https://code.visualstudio.com/download) with the [Go extension](https://code.visualstudio.com/docs/languages/go). Working settings are already in [.vscode/settings.json](https://github.com/qdm12/REPONAME_GITHUB/main/.vscode/settings.json).
 
     </p></details>
 
@@ -92,7 +92,7 @@
     docker build -t qmcgaw/REPONAME_DOCKER .
     ```
 
-1. See [Contributing](https://github.com/qdm12/REPONAME_GITHUB/master/.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
+1. See [Contributing](https://github.com/qdm12/REPONAME_GITHUB/main/.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
 
 ## TODOs
 
@@ -109,4 +109,4 @@
 
 ## License
 
-This repository is under an [MIT license](https://github.com/qdm12/REPONAME_GITHUB/master/license) unless otherwise indicated
+This repository is under an [MIT license](https://github.com/qdm12/REPONAME_GITHUB/main/license) unless otherwise indicated
