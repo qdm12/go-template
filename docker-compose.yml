@@ -8,5 +8,13 @@ services:
       - 8000:8000/tcp
     environment:
       - TZ=America/Montreal
+    secrets:
+      - postgres_user
+      - postgres_password
     restart: always
 
+secrets:
+  postgres_user:
+    file: ./postgres_user
+  postgres_password:
+    file: ./postgres_password
