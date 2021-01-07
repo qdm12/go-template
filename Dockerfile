@@ -1,30 +1,45 @@
 ARG ALPINE_VERSION=3.12
 ARG GO_VERSION=1.15
 
-FROM alpine:${ALPINE_VERSION} AS alpine
-RUN apk --update add ca-certificates tzdata
-
-FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS builder
-ARG GOLANGCI_LINT_VERSION=v1.33.0
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 RUN apk --update add git
 ENV CGO_ENABLED=0
-RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s ${GOLANGCI_LINT_VERSION}
 WORKDIR /tmp/gobuild
 COPY go.mod go.sum ./
-RUN go mod download 2>&1
-COPY .golangci.yml .
-COPY cmd/app/main.go cmd/app/main.go
-COPY internal ./internal
-RUN go test ./...
+RUN go mod download
+COPY cmd/ ./cmd/
+COPY internal/ ./internal/
+
+FROM --platform=$BUILDPLATFORM base AS test
+ENV CGO_ENABLED=1
+RUN apk --update add g++
+RUN go test -race ./...
+
+FROM --platform=$BUILDPLATFORM base AS lint
+ARG GOLANGCI_LINT_VERSION=v1.34.1
+RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
+    sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
+COPY .golangci.yml ./
 RUN golangci-lint run --timeout=10m
+
+FROM --platform=$BUILDPLATFORM base AS build
+COPY --from=qmcgaw/xcputranslate /xcputranslate /usr/local/bin/xcputranslate
+ARG TARGETPLATFORM
 ARG VERSION=unknown
 ARG BUILD_DATE="an unknown date"
 ARG COMMIT=unknown
-RUN go build -o app -trimpath -ldflags="-s -w \
+COPY cmd/ ./cmd/
+COPY internal/ ./internal/
+RUN GOARCH="$(echo ${TARGETPLATFORM} | xcputranslate -field arch)" \
+    GOARM="$(echo ${TARGETPLATFORM} | xcputranslate -field arm)" \
+    go build -trimpath -ldflags="-s -w \
     -X 'main.version=$VERSION' \
     -X 'main.buildDate=$BUILD_DATE' \
-    -X 'main.commit=$COMMIT'" \
-    cmd/app/main.go
+    -X 'main.commit=$COMMIT' \
+    " -o app cmd/app/main.go
+
+FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS alpine
+RUN apk --update add ca-certificates tzdata
 
 FROM scratch
 ARG VERSION=unknown
@@ -55,4 +70,4 @@ ENTRYPOINT ["/app"]
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=2 CMD ["/app","healthcheck"]
 USER 1000
 COPY --chown=1000 postgres/schema.sql /schema.sql
-COPY --from=builder --chown=1000 /tmp/gobuild/app /app
+COPY --from=build --chown=1000 /tmp/gobuild/app /app
