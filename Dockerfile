@@ -22,6 +22,12 @@ RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master
 COPY .golangci.yml ./
 RUN golangci-lint run --timeout=10m
 
+FROM --platform=$BUILDPLATFORM base AS tidy
+COPY .git/ ./.git/
+RUN sed -i '/\/\/ indirect/d' go.mod && \
+    go mod tidy && \
+    git diff --exit-code -- go.mod go.sum
+
 FROM --platform=$BUILDPLATFORM base AS build
 COPY --from=qmcgaw/xcputranslate /xcputranslate /usr/local/bin/xcputranslate
 ARG TARGETPLATFORM
@@ -51,7 +57,7 @@ LABEL \
     org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.revision=$COMMIT \
     org.opencontainers.image.url="https://github.com/qdm12/REPONAME_GITHUB" \
-    org.opencontainers.image.documentation="https://github.com/qdm12/REPONAME_GITHUB/blob/master/README.md" \
+    org.opencontainers.image.documentation="https://github.com/qdm12/REPONAME_GITHUB/blob/main/README.md" \
     org.opencontainers.image.source="https://github.com/qdm12/REPONAME_GITHUB" \
     org.opencontainers.image.title="REPONAME_GITHUB" \
     org.opencontainers.image.description="SHORT_DESCRIPTION"

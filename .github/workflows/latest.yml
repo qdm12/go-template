@@ -30,9 +30,17 @@ jobs:
           DOCKER_BUILDKIT: "1"
         run: docker build --target lint .
 
+  tidy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - env:
+          DOCKER_BUILDKIT: "1"
+        run: docker build --target tidy .
+
   docker:
     runs-on: ubuntu-latest
-    needs: [test, lint]
+    needs: [test, lint, tidy]
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-qemu-action@v1
