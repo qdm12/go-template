@@ -50,6 +50,6 @@ jobs:
             --platform=linux/amd64 \
             --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
             --build-arg COMMIT=`git rev-parse --short HEAD` \
-            --build-arg VERSION="branch-${GITHUB_REF##*/}" \
-            -t qmcgaw/REPONAME_DOCKER:branch-${GITHUB_REF##*/} \
+            --build-arg VERSION="branch-${{ github.head_ref }}" \
+            -t qmcgaw/REPONAME_DOCKER:branch-${{ github.head_ref }} \
             .
