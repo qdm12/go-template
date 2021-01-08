@@ -13,7 +13,9 @@ COPY internal/ ./internal/
 FROM --platform=$BUILDPLATFORM base AS test
 ENV CGO_ENABLED=1
 RUN apk --update add g++
+ARG TEST_TAGS
 RUN go test \
+    -tags ${TEST_TAGS} \
     -race \
     -coverpkg=./... \
     -coverprofile=coverage.txt \
