@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/qdm12/REPONAME_GITHUB/internal/config"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
 	"github.com/qdm12/golibs/crypto/random"
 	"github.com/qdm12/golibs/logging"
@@ -18,8 +19,9 @@ type Database struct {
 }
 
 // NewDatabase creates a database connection pool in DB and pings the database.
-func NewDatabase(host, user, password, database string, logger logging.Logger) (*Database, error) {
-	connStr := "postgres://" + user + ":" + password + "@" + host + "/" + database + "?sslmode=disable&connect_timeout=1"
+func NewDatabase(config config.Postgres, logger logging.Logger) (*Database, error) {
+	connStr := "postgres://" + config.User + ":" + config.Password +
+		"@" + config.Address + "/" + config.Address + "?sslmode=disable&connect_timeout=1"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)

@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/qdm12/REPONAME_GITHUB/internal/config"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
 	"github.com/qdm12/golibs/logging"
@@ -21,11 +22,11 @@ type server struct {
 	handler http.Handler
 }
 
-func New(address, rootURL string, logger logging.Logger,
+func New(c config.HTTP, logger logging.Logger,
 	buildInfo models.BuildInformation, proc processor.Processor) Server {
-	handler := newHandler(rootURL, logger, buildInfo, proc)
+	handler := newHandler(c.RootURL, logger, buildInfo, proc)
 	return &server{
-		address: address,
+		address: c.Address,
 		logger:  logger,
 		handler: handler,
 	}

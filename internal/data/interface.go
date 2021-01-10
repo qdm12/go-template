@@ -1,6 +1,7 @@
 package data
 
 import (
+	"github.com/qdm12/REPONAME_GITHUB/internal/config"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/json"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/memory"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/psql"
@@ -26,6 +27,6 @@ func NewJSON(filepath string) (Database, error) {
 	return json.NewDatabase(memoryDatabase, filepath)
 }
 
-func NewPostgres(host, user, password, database string, logger logging.Logger) (Database, error) {
-	return psql.NewDatabase(host, user, password, database, logger)
+func NewPostgres(config config.Postgres, logger logging.Logger) (Database, error) {
+	return psql.NewDatabase(config, logger)
 }

@@ -6,16 +6,15 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strconv"
 	"sync"
 	"syscall"
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/qdm12/REPONAME_GITHUB/internal/config"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
 	"github.com/qdm12/REPONAME_GITHUB/internal/health"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
-	"github.com/qdm12/REPONAME_GITHUB/internal/params"
 	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
 	"github.com/qdm12/REPONAME_GITHUB/internal/server"
 	"github.com/qdm12/REPONAME_GITHUB/internal/splash"
@@ -39,14 +38,9 @@ func main() {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 
-	paramsReader := params.NewReader()
+	configReader := config.NewReader()
 
-	encoding, level, err := paramsReader.GetLoggerConfig()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	logger, err := logging.NewLogger(encoding, level)
+	logger, err := logging.NewLogger(logging.ConsoleEncoding, logging.InfoLevel)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -56,7 +50,7 @@ func main() {
 
 	errorCh := make(chan error)
 	go func() {
-		errorCh <- _main(ctx, buildInfo, args, logger, paramsReader)
+		errorCh <- _main(ctx, buildInfo, args, logger, configReader)
 	}()
 
 	signalsCh := make(chan os.Signal, 1)
@@ -68,7 +62,7 @@ func main() {
 
 	select {
 	case signal := <-signalsCh:
-		logger.Warn("Caught OS signal %s, shutting down", signal)
+		logger.Warn("Caught OS signal %s, shutting down\n", signal)
 	case err := <-errorCh:
 		close(errorCh)
 		if err == nil { // expected exit such as healthcheck
@@ -95,7 +89,7 @@ func main() {
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger logging.Logger, paramsReader params.Reader) error {
+	args []string, logger logging.Logger, configReader config.Reader) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {
@@ -108,20 +102,20 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 	fmt.Println(splash.Splash(buildInfo))
 
-	listeningPort, warning, err := paramsReader.GetListeningPort()
-	if len(warning) > 0 {
+	config, warnings, err := configReader.ReadConfig()
+	for _, warning := range warnings {
 		logger.Warn(warning)
 	}
 	if err != nil {
 		return err
 	}
 
-	rootURL, err := paramsReader.GetRootURL()
+	logger, err = logging.NewLogger(config.Log.Encoding, config.Log.Level)
 	if err != nil {
 		return err
 	}
 
-	db, err := setupDatabase(paramsReader, logger)
+	db, err := setupDatabase(config.Store, logger)
 	if err != nil {
 		return err
 	}
@@ -132,16 +126,14 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	proc := processor.NewProcessor(db, crypto)
 
 	serverLogger := logger.WithPrefix("http server: ")
-	address := ":" + strconv.Itoa(int(listeningPort)) // TODO env variable
-	server := server.New(address, rootURL, serverLogger, buildInfo, proc)
+	server := server.New(config.HTTP, serverLogger, buildInfo, proc)
 	wg.Add(1)
 	crashed := make(chan error)
 	go server.Run(ctx, wg, crashed)
 
-	const healthServerAddr = "127.0.0.1:9999"
 	healthcheck := func() error { return nil }
 	healthServer := health.NewServer(
-		healthServerAddr, logger.WithPrefix("healthcheck: "),
+		config.Health.Address, logger.WithPrefix("healthcheck: "),
 		healthcheck)
 	wg.Add(1)
 	go healthServer.Run(ctx, wg)
@@ -160,20 +152,15 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 var errDatabaseTypeUnknown = errors.New("database type is unknown")
 
-func setupDatabase(paramsReader params.Reader, logger logging.Logger) (db data.Database, err error) {
-	databaseType := "memory"
-	switch databaseType { // TODO env variable
-	case "memory":
+func setupDatabase(c config.Store, logger logging.Logger) (db data.Database, err error) {
+	switch c.Type {
+	case config.MemoryStoreType:
 		return data.NewMemory()
-	case "json":
-		return data.NewJSON("data.json")
-	case "postgres":
-		dbHost, dbUser, dbPassword, dbName, err := paramsReader.GetDatabaseDetails()
-		if err != nil {
-			return nil, err
-		}
-		return data.NewPostgres(dbHost, dbUser, dbPassword, dbName, logger)
+	case config.JSONStoreType:
+		return data.NewJSON(c.JSON.Filepath)
+	case config.PostgresStoreType:
+		return data.NewPostgres(c.Postgres, logger)
 	default:
-		return nil, fmt.Errorf("%w: %s", errDatabaseTypeUnknown, databaseType)
+		return nil, fmt.Errorf("%w: %s", errDatabaseTypeUnknown, c.Type)
 	}
 }
