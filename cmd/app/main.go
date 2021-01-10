@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -68,8 +70,11 @@ func main() {
 	case signal := <-signalsCh:
 		logger.Warn("Caught OS signal %s, shutting down", signal)
 	case err := <-errorCh:
-		logger.Error(err)
 		close(errorCh)
+		if err == nil { // expected exit such as healthcheck
+			os.Exit(0)
+		}
+		logger.Error(err)
 	}
 
 	cancel()
@@ -90,21 +95,19 @@ func main() {
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	_ []string, logger logging.Logger, paramsReader params.Reader) error {
+	args []string, logger logging.Logger, paramsReader params.Reader) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	if health.IsClientMode(os.Args) {
+	if health.IsClientMode(args) {
 		// Running the program in a separate instance through the Docker
 		// built-in healthcheck, in an ephemeral fashion to query the
 		// long running instance of the program about its status
 		client := health.NewClient()
-		if err := client.Query(ctx); err != nil {
-			return err
-		}
-		return nil
+		return client.Query(ctx)
 	}
 
 	fmt.Println(splash.Splash(buildInfo))
+
 	listeningPort, warning, err := paramsReader.GetListeningPort()
 	if len(warning) > 0 {
 		logger.Warn(warning)
@@ -112,37 +115,50 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	if err != nil {
 		return err
 	}
+
 	rootURL, err := paramsReader.GetRootURL()
 	if err != nil {
 		return err
 	}
+
 	db, err := setupDatabase(paramsReader, logger)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
 	wg := &sync.WaitGroup{}
-	defer wg.Wait()
 
 	crypto := crypto.NewCrypto()
 	proc := processor.NewProcessor(db, crypto)
 
 	serverLogger := logger.WithPrefix("http server: ")
-	address := fmt.Sprintf("0.0.0.0:%d", listeningPort)
+	address := ":" + strconv.Itoa(int(listeningPort)) // TODO env variable
 	server := server.New(address, rootURL, serverLogger, buildInfo, proc)
 	wg.Add(1)
-	go server.Run(ctx, wg)
+	crashed := make(chan error)
+	go server.Run(ctx, wg, crashed)
 
 	const healthServerAddr = "127.0.0.1:9999"
 	healthcheck := func() error { return nil }
-	healthServer := health.NewServer(healthServerAddr, logger.WithPrefix("healthcheck server: "), healthcheck)
+	healthServer := health.NewServer(
+		healthServerAddr, logger.WithPrefix("healthcheck: "),
+		healthcheck)
 	wg.Add(1)
 	go healthServer.Run(ctx, wg)
 
-	<-ctx.Done()
-	return nil
+	select {
+	case <-ctx.Done():
+		wg.Wait()
+		return db.Close()
+	case err := <-crashed:
+		cancel()
+		wg.Wait()
+		_ = db.Close()
+		return err
+	}
 }
+
+var errDatabaseTypeUnknown = errors.New("database type is unknown")
 
 func setupDatabase(paramsReader params.Reader, logger logging.Logger) (db data.Database, err error) {
 	databaseType := "memory"
@@ -158,6 +174,6 @@ func setupDatabase(paramsReader params.Reader, logger logging.Logger) (db data.D
 		}
 		return data.NewPostgres(dbHost, dbUser, dbPassword, dbName, logger)
 	default:
-		return nil, fmt.Errorf("database type %q not supported", databaseType)
+		return nil, fmt.Errorf("%w: %s", errDatabaseTypeUnknown, databaseType)
 	}
 }

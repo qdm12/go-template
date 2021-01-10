@@ -12,7 +12,7 @@ import (
 )
 
 type Server interface {
-	Run(ctx context.Context, wg *sync.WaitGroup)
+	Run(ctx context.Context, wg *sync.WaitGroup, crashed chan<- error)
 }
 
 type server struct {
@@ -31,7 +31,7 @@ func New(address, rootURL string, logger logging.Logger,
 	}
 }
 
-func (s *server) Run(ctx context.Context, wg *sync.WaitGroup) {
+func (s *server) Run(ctx context.Context, wg *sync.WaitGroup, crashed chan<- error) {
 	defer wg.Done()
 	server := http.Server{Addr: s.address, Handler: s.handler}
 	go func() {
@@ -45,12 +45,10 @@ func (s *server) Run(ctx context.Context, wg *sync.WaitGroup) {
 			s.logger.Error("failed shutting down: %s", err)
 		}
 	}()
-	for ctx.Err() == nil {
-		s.logger.Info("listening on %s", s.address)
-		err := server.ListenAndServe()
-		if err != nil && ctx.Err() == nil { // server crashed
-			s.logger.Error(err)
-			s.logger.Info("restarting")
-		}
+
+	s.logger.Info("listening on %s", s.address)
+	err := server.ListenAndServe()
+	if err != nil && ctx.Err() != context.Canceled { // server crashed
+		crashed <- err
 	}
 }
