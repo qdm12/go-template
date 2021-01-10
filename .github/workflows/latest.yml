@@ -20,7 +20,16 @@ jobs:
       - uses: actions/checkout@v2
       - env:
           DOCKER_BUILDKIT: "1"
-        run: docker build --target test .
+        run: docker build --target base -t base .
+      - name: Run tests in container
+        run: |
+          docker run --rm -e CGO_ENABLED=1 base \
+          go test \
+          -race \
+          -coverpkg=./... \
+          -coverprofile=coverage.txt \
+          -covermode=atomic \
+          ./...
 
   lint:
     runs-on: ubuntu-latest

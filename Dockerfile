@@ -2,25 +2,14 @@ ARG ALPINE_VERSION=3.12
 ARG GO_VERSION=1.15
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
-RUN apk --update add git
+# g++ is installed for the -race detector in go test
+RUN apk --update add git g++
 ENV CGO_ENABLED=0
 WORKDIR /tmp/gobuild
 COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
-
-FROM --platform=$BUILDPLATFORM base AS test
-ENV CGO_ENABLED=1
-RUN apk --update add g++
-ARG TEST_TAGS
-RUN go test \
-    -tags ${TEST_TAGS} \
-    -race \
-    -coverpkg=./... \
-    -coverprofile=coverage.txt \
-    -covermode=atomic \
-    ./...
 
 FROM --platform=$BUILDPLATFORM base AS lint
 ARG GOLANGCI_LINT_VERSION=v1.34.1
