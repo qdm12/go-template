@@ -14,13 +14,44 @@ on:
       - go.sum
 
 jobs:
-  test:
+  base:
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+        volumes:
+          - /tmp/docker-registry:/var/lib/registry
     steps:
+      - name: Cache Docker registry
+        uses: actions/cache@v2
+        with:
+          path: /tmp/docker-registry
+          key: docker-registry-${{ github.sha }}
       - uses: actions/checkout@v2
       - env:
-          DOCKER_BUILDKIT: "1"
-        run: docker build --target base -t base .
+          DOCKER_BUILDKIT: 1
+        run: docker build --target base -t localhost:5000/base .
+      - run: docker push localhost:5000/base
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+        volumes:
+          - /tmp/docker-registry:/var/lib/registry
+    steps:
+      - name: Cache Docker registry
+        uses: actions/cache@v2
+        with:
+          path: /tmp/docker-registry
+          key: docker-registry-${{ github.sha }}
+      - run: docker pull localhost:5000/base
+      - run: docker tag localhost:5000/base base
       - name: Run tests in container
         run: |
           docker run --rm -e CGO_ENABLED=1 base \
@@ -33,19 +64,49 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+        volumes:
+          - /tmp/docker-registry:/var/lib/registry
     steps:
+      - name: Cache Docker registry
+        uses: actions/cache@v2
+        with:
+          path: /tmp/docker-registry
+          key: docker-registry-${{ github.sha }}
+      - run: docker pull localhost:5000/base
+      - run: docker tag localhost:5000/base base
       - uses: actions/checkout@v2
       - env:
-          DOCKER_BUILDKIT: "1"
-        run: docker build --target lint .
+          DOCKER_BUILDKIT: 1
+          # BUILDKIT_INLINE_CACHE: 1
+        run: docker build --target lint --cache-from base .
 
   tidy:
     runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+        volumes:
+          - /tmp/docker-registry:/var/lib/registry
     steps:
+      - name: Cache Docker registry
+        uses: actions/cache@v2
+        with:
+          path: /tmp/docker-registry
+          key: docker-registry-${{ github.sha }}
+      - run: docker pull localhost:5000/base
+      - run: docker tag localhost:5000/base base
       - uses: actions/checkout@v2
       - env:
-          DOCKER_BUILDKIT: "1"
-        run: docker build --target tidy .
+          DOCKER_BUILDKIT: 1
+          # BUILDKIT_INLINE_CACHE: 1
+        run: docker build --target tidy --cache-from base .
 
   docker:
     runs-on: ubuntu-latest
