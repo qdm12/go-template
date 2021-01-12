@@ -37,6 +37,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    needs: [base]
     services:
       registry:
         image: registry:2
@@ -64,6 +65,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    needs: [base]
     services:
       registry:
         image: registry:2
@@ -87,6 +89,7 @@ jobs:
 
   tidy:
     runs-on: ubuntu-latest
+    needs: [base]
     services:
       registry:
         image: registry:2
