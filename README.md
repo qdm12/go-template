@@ -96,17 +96,6 @@
 
 ## TODOs
 
-- Switch to Go's mock library
-- Use [Gox](https://github.com/mitchellh/gox)
-- Database
-    - Add database type environment variable
-    - Add bbolt as database option
-    - Add Redis interface in a kv package (as data)
-    - Build tag for database integration tests
-    - Unit tests with mocked
-    - Integration tests
-- Unit tests the server with httprecorder
-
 ## License
 
 This repository is under an [MIT license](https://github.com/qdm12/REPONAME_GITHUB/main/license) unless otherwise indicated
