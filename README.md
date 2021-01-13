@@ -17,7 +17,7 @@
 
 ## Features
 
-- Compatible with `amd64`, `386`, `arm64`, `arm32v7`, `arm32v6`, `ppc64le` and `s390x` CPU architectures
+- Compatible with `amd64`, `386`, `arm64`, `arm32v7`, `arm32v6`, `ppc64le`, `s390x` and `riscv64` CPU architectures
 - [Docker image tags and sizes](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER/tags)
 
 ## Setup
