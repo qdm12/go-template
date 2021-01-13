@@ -29,7 +29,8 @@ RUN git init && \
     git diff --exit-code -- go.mod
 
 FROM --platform=$BUILDPLATFORM base AS build
-COPY --from=qmcgaw/xcputranslate /xcputranslate /usr/local/bin/xcputranslate
+ARG XCPU_VERSION=v0.3.0
+COPY --from=qmcgaw/xcputranslate:${XCPU_VERSION} /xcputranslate /usr/local/bin/xcputranslate
 ARG TARGETPLATFORM
 ARG VERSION=unknown
 ARG BUILD_DATE="an unknown date"
