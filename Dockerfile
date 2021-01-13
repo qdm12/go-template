@@ -20,10 +20,13 @@ COPY .golangci.yml ./
 RUN golangci-lint run --timeout=10m
 
 FROM --platform=$BUILDPLATFORM base AS tidy
-COPY .git/ ./.git/
-RUN sed -i '/\/\/ indirect/d' go.mod && \
+RUN git init && \
+    git config user.email ci@localhost && \
+    git config user.name ci && \
+    git add -A && git commit -m ci && \
+    sed -i '/\/\/ indirect/d' go.mod && \
     go mod tidy && \
-    git diff --exit-code -- go.mod go.sum
+    git diff --exit-code -- go.mod
 
 FROM --platform=$BUILDPLATFORM base AS build
 COPY --from=qmcgaw/xcputranslate /xcputranslate /usr/local/bin/xcputranslate
