@@ -4,7 +4,7 @@ ARG GO_VERSION=1.15
 ARG BUILDPLATFORM=linux/amd64
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
-RUN apk --update add git g++
+RUN apk --update add git
 ENV CGO_ENABLED=0
 WORKDIR /tmp/gobuild
 # Copy repository code and install Go dependencies
