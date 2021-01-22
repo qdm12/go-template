@@ -1,4 +1,4 @@
-ARG ALPINE_VERSION=3.12
+ARG ALPINE_VERSION=3.13
 ARG GO_VERSION=1.15
 # Sets linux/amd64 in case it's not injected by older Docker versions
 ARG BUILDPLATFORM=linux/amd64
