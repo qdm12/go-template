@@ -1,5 +1,7 @@
 ARG ALPINE_VERSION=3.12
 ARG GO_VERSION=1.15
+# Sets linux/amd64 in case it's not injected by older Docker versions
+ARG BUILDPLATFORM=linux/amd64
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 # g++ is installed for the -race detector in go test
@@ -29,8 +31,7 @@ RUN git init && \
     git diff --exit-code -- go.mod
 
 FROM --platform=$BUILDPLATFORM base AS build
-ARG XCPU_VERSION=v0.3.0
-COPY --from=qmcgaw/xcputranslate:${XCPU_VERSION} /xcputranslate /usr/local/bin/xcputranslate
+COPY --from=qmcgaw/xcputranslate:v0.4.0 /xcputranslate /usr/local/bin/xcputranslate
 ARG TARGETPLATFORM
 ARG VERSION=unknown
 ARG BUILD_DATE="an unknown date"
