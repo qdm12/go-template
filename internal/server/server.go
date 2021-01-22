@@ -37,7 +37,7 @@ func (s *server) Run(ctx context.Context, wg *sync.WaitGroup, crashed chan<- err
 	server := http.Server{Addr: s.address, Handler: s.handler}
 	go func() {
 		<-ctx.Done()
-		s.logger.Warn("shutting down (context canceled)")
+		s.logger.Warn("context canceled: shutting down")
 		defer s.logger.Warn("shut down")
 		const shutdownGraceDuration = 2 * time.Second
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownGraceDuration)

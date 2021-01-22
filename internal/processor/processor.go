@@ -6,6 +6,8 @@ import (
 	"github.com/qdm12/golibs/crypto"
 )
 
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Processor
+
 // Processor has methods to process data and return results.
 type Processor interface {
 	GetUserByID(id uint64) (user models.User, err error)
