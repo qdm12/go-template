@@ -1,7 +1,18 @@
-name: latest
+name: CI
 on:
   push:
-    branches: [main]
+    paths:
+      - .github/workflows/latest.yml
+      - cmd/**
+      - internal/**
+      - pkg/**
+      - .dockerignore
+      - .golangci.yml
+      - Dockerfile
+      - go.mod
+      - go.sum
+  release:
+    types: [published]
     paths:
       - .github/workflows/latest.yml
       - cmd/**
@@ -14,49 +25,89 @@ on:
       - go.sum
 
 jobs:
-  job:
+  verify:
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: "1"
     steps:
       - uses: actions/checkout@v2
-      - name: Build base image
-        run: docker build --target base -t base .
-      - name: Run tests in container
+
+      - name: Linting
+        run: docker build --target lint .
+
+      - name: Go mod tidy check
+        run: docker build --target tidy .
+
+      - name: Build test image
+        run: docker build --target test -t test-container .
+
+      - name: Run tests in test container
         run: |
-          docker run --rm -e CGO_ENABLED=1 base \
+          touch coverage.txt
+          docker run --rm \
+          -v "$(pwd)/coverage.txt:/tmp/gobuild/coverage.txt" \
+          test-container \
           go test \
           -race \
           -coverpkg=./... \
           -coverprofile=coverage.txt \
           -covermode=atomic \
           ./...
-      - name: Linting
-        run: docker build --target lint .
-      - name: Go mod tidy check
-        run: docker build --target tidy .
+
+      # We run this here to use the caching of the previous steps
+      - if: github.event_name == 'push'
+        name: Build final image
+        run: docker build .
+
+  publish:
+    if: github.event_name == 'release' ||
+      (github.event_name == 'push' &&
+      github.event.ref == 'refs/heads/main')
+    needs: [verify]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
-      - uses: docker/login-action@v1
-        with:
-          username: qmcgaw
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # - uses: docker/login-action@v1
+      #   with:
+      #     username: qmcgaw
+      #     password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       - name: Set variables
         id: vars
+        env:
+          EVENT_NAME: ${{ github.event_name }}
         run: |
+          BRANCH=${GITHUB_REF#refs/heads/}
           echo ::set-output name=commit::$(git rev-parse --short HEAD)
           echo ::set-output name=build_date::$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          echo ::set-output name=version::latest
-      - name: Build and push image
+          echo ::set-output name=version::${GITHUB_REF#refs/heads/}
+          if [ "$EVENT_NAME" = "push" ] && [ "$BRANCH" != "main" ]; then
+            echo ::set-output name=version::$BRANCH
+            echo ::set-output name=platforms::linux/amd64
+          elif [ "$EVENT_NAME" = "push" ] && [ "$BRANCH" = "main" ]; then
+            echo ::set-output name=version::latest
+            echo ::set-output name=platforms::linux/amd64,linux/386,linux/arm64,linux/arm/v6,linux/arm/v7,linux/s390x,linux/ppc64le,linux/riscv64
+          else
+            echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+            echo ::set-output name=platforms::linux/amd64,linux/386,linux/arm64,linux/arm/v6,linux/arm/v7,linux/s390x,linux/ppc64le,linux/riscv64
+          fi
+
+      - name: Build and push final image
         uses: docker/build-push-action@v2
         with:
-          platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v6,linux/arm/v7,linux/s390x,linux/ppc64le,linux/riscv64
+          platforms: ${{ steps.vars.outputs.platforms }}
           build-args: |
             BUILD_DATE=${{ steps.vars.outputs.build_date }}
             COMMIT=${{ steps.vars.outputs.commit }}
             VERSION=${{ steps.vars.outputs.version }}
           tags: qmcgaw/reponame_docker:${{ steps.vars.outputs.version }}
-          push: true
-      - name: Microbadger hook
+          # push: true
+
+      - if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
+        name: Microbadger hook
         run: curl -X POST https://hooks.microbadger.com/images/qmcgaw/REPONAME_DOCKER/WEBHOOK_LINK
         continue-on-error: true

@@ -4,11 +4,7 @@ ARG GO_VERSION=1.15
 ARG BUILDPLATFORM=linux/amd64
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
-# g++ is installed for the -race detector in go test
 RUN apk --update add git g++
-ARG GOLANGCI_LINT_VERSION=v1.34.1
-RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
-    sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
 ENV CGO_ENABLED=0
 WORKDIR /tmp/gobuild
 # Copy repository code and install Go dependencies
@@ -17,7 +13,18 @@ RUN go mod download
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 
+FROM --platform=$BUILDPLATFORM base AS test
+# Note on the go race detector:
+# - we use golang:1.15-alpine and not golang:1.15-alpine3.12 to have the race detector fixed
+# - we set CGO_ENABLED=1 to have it enabled
+# - we install g++ to support the race detector
+ENV CGO_ENABLED=1
+RUN apk -q --update --no-cache add g++
+
 FROM --platform=$BUILDPLATFORM base AS lint
+ARG GOLANGCI_LINT_VERSION=v1.34.1
+RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
+    sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
 COPY .golangci.yml ./
 RUN golangci-lint run --timeout=10m
 
