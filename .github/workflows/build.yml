@@ -11,18 +11,6 @@ on:
       - Dockerfile
       - go.mod
       - go.sum
-  release:
-    types: [published]
-    paths:
-      - .github/workflows/build.yml
-      - cmd/**
-      - internal/**
-      - pkg/**
-      - .dockerignore
-      - .golangci.yml
-      - Dockerfile
-      - go.mod
-      - go.sum
 
 jobs:
   verify:
@@ -55,14 +43,10 @@ jobs:
           ./...
 
       # We run this here to use the caching of the previous steps
-      - if: github.event_name == 'push'
-        name: Build final image
+      - name: Build final image
         run: docker build .
 
   publish:
-    if: github.event_name == 'release' ||
-      (github.event_name == 'push' &&
-      github.event.ref == 'refs/heads/main')
     needs: [verify]
     runs-on: ubuntu-latest
     steps:
@@ -78,22 +62,20 @@ jobs:
 
       - name: Set variables
         id: vars
-        env:
-          EVENT_NAME: ${{ github.event_name }}
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
+          TAG=${GITHUB_REF#refs/tags/}
           echo ::set-output name=commit::$(git rev-parse --short HEAD)
           echo ::set-output name=build_date::$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          echo ::set-output name=version::${GITHUB_REF#refs/heads/}
-          if [ "$EVENT_NAME" = "push" ] && [ "$BRANCH" != "main" ]; then
-            echo ::set-output name=version::$BRANCH
-            echo ::set-output name=platforms::linux/amd64
-          elif [ "$EVENT_NAME" = "push" ] && [ "$BRANCH" = "main" ]; then
+          if [ "$TAG" != "$GITHUB_REF" ]; then
+            echo ::set-output name=version::$TAG
+            echo ::set-output name=platforms::linux/amd64,linux/386,linux/arm64,linux/arm/v6,linux/arm/v7,linux/s390x,linux/ppc64le,linux/riscv64
+          elif [ "$BRANCH" = "main" ]; then
             echo ::set-output name=version::latest
             echo ::set-output name=platforms::linux/amd64,linux/386,linux/arm64,linux/arm/v6,linux/arm/v7,linux/s390x,linux/ppc64le,linux/riscv64
           else
-            echo ::set-output name=version::${GITHUB_REF#refs/tags/}
-            echo ::set-output name=platforms::linux/amd64,linux/386,linux/arm64,linux/arm/v6,linux/arm/v7,linux/s390x,linux/ppc64le,linux/riscv64
+            echo ::set-output name=version::$BRANCH
+            echo ::set-output name=platforms::linux/amd64
           fi
 
       - name: Build and push final image
@@ -107,7 +89,7 @@ jobs:
           tags: qmcgaw/reponame_docker:${{ steps.vars.outputs.version }}
           push: true
 
-      - if: github.event_name == 'push' && github.event.ref == 'refs/heads/main'
+      - if: github.event.ref == 'refs/heads/main'
         name: Microbadger hook
         run: curl -X POST https://hooks.microbadger.com/images/qmcgaw/REPONAME_DOCKER/WEBHOOK_LINK
         continue-on-error: true
