@@ -11,6 +11,17 @@ on:
       - Dockerfile
       - go.mod
       - go.sum
+  pull_request:
+    paths:
+      - .github/workflows/build.yml
+      - cmd/**
+      - internal/**
+      - pkg/**
+      - .dockerignore
+      - .golangci.yml
+      - Dockerfile
+      - go.mod
+      - go.sum
 
 jobs:
   verify:
@@ -48,6 +59,7 @@ jobs:
 
   publish:
     needs: [verify]
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
