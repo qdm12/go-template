@@ -6,8 +6,8 @@ import (
 
 type Postgres struct {
 	Address  string
-	User     string // TODO from secret
-	Password string // TODO from secret
+	User     string
+	Password string
 	Database string
 }
 

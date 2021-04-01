@@ -32,7 +32,5 @@ func newRouter(config config.HTTP, logger logging.Logger,
 	router.Mount(APIPrefix+"/users", users.NewHandler(logger, proc))
 	router.Mount(APIPrefix+"/build", build.NewHandler(logger, buildInfo))
 
-	// router.Handle("/metrics", promhttp.Handler()) // TODO
-
 	return router
 }
