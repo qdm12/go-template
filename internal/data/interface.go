@@ -1,3 +1,4 @@
+// Package data contains a Database interface with multiple implementations.
 package data
 
 import (

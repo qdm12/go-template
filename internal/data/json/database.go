@@ -1,3 +1,5 @@
+// Package json implements a data store using a single JSON file
+// and the memory package.
 package json
 
 import (

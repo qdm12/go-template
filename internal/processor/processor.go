@@ -1,3 +1,6 @@
+// Package processor contains operations the server can run and
+// serves as the middle ground between the network server and
+// the data store.
 package processor
 
 import (

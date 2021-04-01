@@ -1,3 +1,4 @@
+// Package splash contains functions to log out splash initial information.
 package splash
 
 import (

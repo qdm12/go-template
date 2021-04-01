@@ -1,3 +1,4 @@
+// Package models contains data structures common through the program.
 package models
 
 type User struct {

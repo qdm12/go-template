@@ -1,3 +1,5 @@
+// Package psql implements a data store using a client to a
+// Postgres database.
 package psql
 
 import (

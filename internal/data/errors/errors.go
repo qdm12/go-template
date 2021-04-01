@@ -1,3 +1,4 @@
+// Package errors contains database errors common to all implementations.
 package errors
 
 import "errors"
