@@ -9,5 +9,5 @@ const (
 
 const (
 	// IssueLink is the link for users to use to create issues.
-	IssueLink = "https://github.com/qdm12/REPONAME_GITHUB/issues/new"
+	IssueLink = "https://github.com/qdm12/go-template/issues/new"
 )

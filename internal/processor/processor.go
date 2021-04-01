@@ -6,8 +6,8 @@ package processor
 import (
 	"context"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/data"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/data"
+	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/golibs/crypto"
 )
 

@@ -4,11 +4,11 @@ package data
 import (
 	"context"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/config"
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/json"
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/memory"
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/psql"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/config"
+	"github.com/qdm12/go-template/internal/data/json"
+	"github.com/qdm12/go-template/internal/data/memory"
+	"github.com/qdm12/go-template/internal/data/psql"
+	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/golibs/logging"
 )
 

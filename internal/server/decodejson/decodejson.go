@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/server/httperr"
+	"github.com/qdm12/go-template/internal/server/httperr"
 )
 
 func DecodeBody(w http.ResponseWriter, maxBytes int64,

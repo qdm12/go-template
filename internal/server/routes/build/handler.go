@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/golibs/logging"
 )
 

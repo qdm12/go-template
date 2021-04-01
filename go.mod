@@ -1,4 +1,4 @@
-module github.com/qdm12/REPONAME_GITHUB
+module github.com/qdm12/go-template
 
 go 1.16
 

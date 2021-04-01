@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/golang/mock/gomock"
-	"github.com/qdm12/REPONAME_GITHUB/internal/metrics/mock_metrics"
+	"github.com/qdm12/go-template/internal/metrics/mock_metrics"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

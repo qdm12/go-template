@@ -1,5 +1,5 @@
 {
-    "name": "REPONAME_GITHUB-dev",
+    "name": "go-template-dev",
     "dockerComposeFile": [
         "docker-compose.yml"
     ],

@@ -5,11 +5,11 @@ import (
 	"errors"
 	"net/http"
 
-	dataerr "github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
-	contenttype "github.com/qdm12/REPONAME_GITHUB/internal/server/contenttypes"
-	"github.com/qdm12/REPONAME_GITHUB/internal/server/decodejson"
-	"github.com/qdm12/REPONAME_GITHUB/internal/server/httperr"
+	dataerr "github.com/qdm12/go-template/internal/data/errors"
+	"github.com/qdm12/go-template/internal/models"
+	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
+	"github.com/qdm12/go-template/internal/server/decodejson"
+	"github.com/qdm12/go-template/internal/server/httperr"
 )
 
 // Handler for creating a user (POST /users/).

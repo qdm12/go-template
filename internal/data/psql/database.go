@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/config"
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
+	"github.com/qdm12/go-template/internal/config"
+	"github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/golibs/crypto/random"
 	"github.com/qdm12/golibs/logging"
 )

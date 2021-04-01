@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	contenttype "github.com/qdm12/REPONAME_GITHUB/internal/server/contenttypes"
-	"github.com/qdm12/REPONAME_GITHUB/internal/server/httperr"
+	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
+	"github.com/qdm12/go-template/internal/server/httperr"
 )
 
 // Handler to get the program build information (GET /).

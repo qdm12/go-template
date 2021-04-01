@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/data/errors"
+	"github.com/qdm12/go-template/internal/models"
 )
 
 func (db *Database) CreateUser(_ context.Context, user models.User) (err error) {

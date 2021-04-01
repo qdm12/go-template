@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/data/errors"
+	"github.com/qdm12/go-template/internal/models"
 )
 
 // CreateUser inserts a user in the database.

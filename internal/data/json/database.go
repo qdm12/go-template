@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
-	"github.com/qdm12/REPONAME_GITHUB/internal/data/memory"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/data/errors"
+	"github.com/qdm12/go-template/internal/data/memory"
+	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/golibs/files"
 )
 

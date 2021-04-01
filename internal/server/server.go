@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/config"
-	"github.com/qdm12/REPONAME_GITHUB/internal/metrics"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
-	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
+	"github.com/qdm12/go-template/internal/config"
+	"github.com/qdm12/go-template/internal/metrics"
+	"github.com/qdm12/go-template/internal/models"
+	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/golibs/logging"
 )
 

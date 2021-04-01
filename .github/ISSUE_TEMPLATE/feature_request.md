@@ -12,4 +12,4 @@ title: 'Feature request: FILL THIS TEXT!'
 **Optional extra information** 🚀
 
 - I tried `this` and it doesn't work
-- That [url](https://github.com/qdm12/REPONAME_GITHUB) is interesting
+- That [url](https://github.com/qdm12/go-template) is interesting

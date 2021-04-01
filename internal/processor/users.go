@@ -3,7 +3,7 @@ package processor
 import (
 	"context"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/models"
 )
 
 func (p *processor) CreateUser(ctx context.Context, user models.User) error {

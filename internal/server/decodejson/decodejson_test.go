@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	contenttype "github.com/qdm12/REPONAME_GITHUB/internal/server/contenttypes"
+	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -9,9 +9,9 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
-	dataerr "github.com/qdm12/REPONAME_GITHUB/internal/data/errors"
-	contenttype "github.com/qdm12/REPONAME_GITHUB/internal/server/contenttypes"
-	"github.com/qdm12/REPONAME_GITHUB/internal/server/httperr"
+	dataerr "github.com/qdm12/go-template/internal/data/errors"
+	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
+	"github.com/qdm12/go-template/internal/server/httperr"
 )
 
 // Handler to get a user by ID (GET /users/{id}).

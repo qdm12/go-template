@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/kyokomi/emoji"
-	"github.com/qdm12/REPONAME_GITHUB/internal/constants"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
+	"github.com/qdm12/go-template/internal/constants"
+	"github.com/qdm12/go-template/internal/models"
 )
 
 // Splash returns the welcome spash message.
@@ -28,7 +28,7 @@ func title() []string {
 	return []string{
 		"=========================================",
 		"=========================================",
-		"========= REPONAME_GITHUB ========",
+		"============== go-template ==============",
 		"=========================================",
 		"=== Made with " + emoji.Sprint(":heart:") + " by github.com/qdm12 ====",
 		"=========================================",
