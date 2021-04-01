@@ -1,6 +1,6 @@
 module github.com/qdm12/REPONAME_GITHUB
 
-go 1.15
+go 1.16
 
 require (
 	github.com/golang/mock v1.4.3
