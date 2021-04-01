@@ -18,8 +18,5 @@ func (m *Metrics) get(env params.Env) (warning string, err error) {
 
 func (m *Metrics) getAddress(env params.Env) (address, warning string, err error) {
 	const envKey = "METRICS_SERVER_ADDRESS"
-	options := []params.OptionSetter{
-		params.Default("0.0.0.0:9090"),
-	}
-	return env.ListeningAddress(envKey, options...)
+	return env.ListeningAddress(envKey, params.Default("0.0.0.0:9090"))
 }
