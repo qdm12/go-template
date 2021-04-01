@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Reader
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Responder
 
 type Responder interface {
 	Respond(w http.ResponseWriter, status int, errString string)
