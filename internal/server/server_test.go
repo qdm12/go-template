@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/qdm12/REPONAME_GITHUB/internal/config"
+	"github.com/qdm12/REPONAME_GITHUB/internal/metrics/mock_metrics"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 	"github.com/qdm12/REPONAME_GITHUB/internal/processor/mock_processor"
 	"github.com/qdm12/golibs/logging/mock_logging"
@@ -22,17 +23,16 @@ func Test_New(t *testing.T) {
 		Address: "test",
 	}
 	logger := mock_logging.NewMockLogger(ctrl)
+	metrics := mock_metrics.NewMockMetrics(ctrl)
 	buildInformation := models.BuildInformation{}
 	proc := mock_processor.NewMockProcessor(ctrl)
 
-	serverInterface := New(config, logger, buildInformation, proc)
+	serverInterface := New(config, proc, logger, metrics, buildInformation)
 	serverImpl, ok := serverInterface.(*server)
 	require.True(t, ok)
 	assert.Equal(t, config.Address, serverImpl.address)
 	assert.Equal(t, logger, serverImpl.logger)
-	handlerImpl, ok := serverImpl.handler.(*handler)
-	require.True(t, ok)
-	assert.Equal(t, logger, handlerImpl.logger)
+	assert.NotNil(t, serverImpl.handler)
 }
 
 func Test_server_Run(t *testing.T) {

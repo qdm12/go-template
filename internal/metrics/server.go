@@ -1,5 +1,4 @@
-// Package server implements an HTTP server.
-package server
+package metrics
 
 import (
 	"context"
@@ -7,10 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qdm12/REPONAME_GITHUB/internal/config"
-	"github.com/qdm12/REPONAME_GITHUB/internal/metrics"
-	"github.com/qdm12/REPONAME_GITHUB/internal/models"
-	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/qdm12/golibs/logging"
 )
 
@@ -24,14 +20,11 @@ type server struct {
 	handler http.Handler
 }
 
-func New(c config.HTTP, proc processor.Processor,
-	logger logging.Logger, metrics metrics.Metrics,
-	buildInfo models.BuildInformation) Server {
-	handler := newRouter(c, logger, metrics, buildInfo, proc)
+func NewServer(address string, logger logging.Logger) Server {
 	return &server{
-		address: c.Address,
+		address: address,
 		logger:  logger,
-		handler: handler,
+		handler: promhttp.Handler(),
 	}
 }
 

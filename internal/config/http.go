@@ -5,8 +5,11 @@ import (
 )
 
 type HTTP struct {
-	Address string
-	RootURL string
+	Address        string
+	RootURL        string
+	LogRequests    bool
+	AllowedOrigins []string
+	AllowedHeaders []string
 }
 
 func (h *HTTP) get(env params.Env) (warning string, err error) {

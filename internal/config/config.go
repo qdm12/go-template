@@ -10,10 +10,11 @@ import (
 )
 
 type Config struct {
-	HTTP   HTTP
-	Log    Log
-	Store  Store
-	Health Health
+	HTTP    HTTP
+	Metrics Metrics
+	Log     Log
+	Store   Store
+	Health  Health
 }
 
 var (
@@ -25,6 +26,14 @@ var (
 
 func (c *Config) get(env params.Env) (warnings []string, err error) {
 	warning, err := c.HTTP.get(env)
+	if len(warning) > 0 {
+		warnings = append(warnings, warning)
+	}
+	if err != nil {
+		return warnings, fmt.Errorf("%w: %s", ErrHTTPConfig, err)
+	}
+
+	warning, err = c.Metrics.get(env)
 	if len(warning) > 0 {
 		warnings = append(warnings, warning)
 	}

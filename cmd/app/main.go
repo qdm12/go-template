@@ -14,6 +14,7 @@ import (
 	"github.com/qdm12/REPONAME_GITHUB/internal/config"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data"
 	"github.com/qdm12/REPONAME_GITHUB/internal/health"
+	"github.com/qdm12/REPONAME_GITHUB/internal/metrics"
 	"github.com/qdm12/REPONAME_GITHUB/internal/models"
 	"github.com/qdm12/REPONAME_GITHUB/internal/processor"
 	"github.com/qdm12/REPONAME_GITHUB/internal/server"
@@ -121,14 +122,24 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	}
 
 	wg := &sync.WaitGroup{}
+	crashed := make(chan error)
 
 	crypto := crypto.NewCrypto()
 	proc := processor.NewProcessor(db, crypto)
 
-	serverLogger := logger.WithPrefix("http server: ")
-	server := server.New(config.HTTP, serverLogger, buildInfo, proc)
+	metricsLogger := logger.WithPrefix("metrics server: ")
+	metricsServer := metrics.NewServer(config.Metrics.Address, metricsLogger)
+	const registerMetrics = true
+	metrics, err := metrics.New(registerMetrics)
+	if err != nil {
+		return err
+	}
 	wg.Add(1)
-	crashed := make(chan error)
+	go metricsServer.Run(ctx, wg, crashed)
+
+	serverLogger := logger.WithPrefix("http server: ")
+	server := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
+	wg.Add(1)
 	go server.Run(ctx, wg, crashed)
 
 	healthcheck := func() error { return nil }
