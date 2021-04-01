@@ -40,14 +40,20 @@
 
 | Environment variable | Default | Possible values | Description |
 | --- | --- | --- | --- |
-| `LOG_ENCODING` | `console` | `json`, `console` | Logging format |
+| `HTTP_SERVER_ADDRESS` | `0.0.0.0:8000` | Valid address | HTTP server listening address |
+| `HTTP_SERVER_ROOT_URL` | `/` | URL path | HTTP server root URL |
+| `HTTP_SERVER_LOG_REQUESTS` | `on` | `on` or `off` | Log requests and responses information |
+| `HTTP_SERVER_ALLOWED_ORIGINS` | | CSV of addresses | Comma separated list of addresses to allow for CORS |
+| `HTTP_SERVER_ALLOWED_HEADERS` | | CSV of HTTP header keys | Comma separated list of header keys to allow for CORS |
+| `METRICS_SERVER_ADDRESS` | `0.0.0.0:9090` | Valid address | Prometheus HTTP server listening address |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warning`, `error` | Logging level |
-| `LISTENING_PORT` | `8000` | Integer between `1` and `65535` | Internal listening TCP port |
-| `ROOT_URL` | `/` | URL path *string* | URL path, used if behind a reverse proxy |
-| `SQL_HOST` | `postgres` | *string* | Database hostname |
-| `SQL_USER` | `postgres` | *string* | Database user |
-| `SQL_PASSWORD` | `postgres` | *string* | Database password |
-| `SQL_DBNAME` | `postgres` | *string* | Database name |
+| `STORE_TYPE` | `memory` | `memory`, `json` or `postgres` | Data store type |
+| `STORE_JSON_FILEPATH` | `data.json` | Valid filepath | JSON file to use if `STORE_TYPE=json` |
+| `STORE_POSTGRES_ADDRESS` | `psql:5432` | Valid address | Postgres database address if `STORE_TYPE=postgres` |
+| `STORE_POSTGRES_USER` | `postgres` | | Postgres database user if `STORE_TYPE=postgres` |
+| `STORE_POSTGRES_PASSWORD` | `postgres` | | Postgres database password if `STORE_TYPE=postgres` |
+| `STORE_POSTGRES_DATABASE` | `database` | | Postgres database name if `STORE_TYPE=postgres` |
+| `HEALTH_SERVER_ADDRESS` | `127.0.0.1:9999` | Valid address | Health server listening address |
 | `TZ` | `America/Montreal` | *string* | Timezone |
 
 ## Development

@@ -69,15 +69,21 @@ LABEL \
     org.opencontainers.image.description="SHORT_DESCRIPTION"
 COPY --from=alpine --chown=1000 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=alpine --chown=1000 /usr/share/zoneinfo /usr/share/zoneinfo
-ENV TZ=America/Montreal \
-    LOG_ENCODING=console \
+ENV HTTP_SERVER_ADDRESS=0.0.0.0:8000 \
+    HTTP_SERVER_ROOT_URL=/ \
+    HTTP_SERVER_LOG_REQUESTS=on \
+    HTTP_SERVER_ALLOWED_ORIGINS= \
+    HTTP_SERVER_ALLOWED_HEADERS= \
+    METRICS_SERVER_ADDRESS=0.0.0.0:9090 \
     LOG_LEVEL=info \
-    LISTENING_PORT=8000 \
-    ROOT_URL=/ \
-    SQL_HOST=postgres \
-    SQL_USER=postgres \
-    SQL_PASSWORD=postgres \
-    SQL_DBNAME=postgres
+    STORE_TYPE=memory \
+    STORE_JSON_FILEPATH=data.json \
+    STORE_POSTGRES_ADDRESS=psql:5432 \
+    STORE_POSTGRES_USER=postgres \
+    STORE_POSTGRES_PASSWORD=postgres \
+    STORE_POSTGRES_DATABASE=database \
+    HEALTH_SERVER_ADDRESS=127.0.0.1:9999 \
+    TZ=America/Montreal
 ENTRYPOINT ["/app"]
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=2 CMD ["/app","healthcheck"]
 USER 1000
