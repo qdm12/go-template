@@ -5,59 +5,61 @@
 package mock_processor
 
 import (
+	context "context"
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 	models "github.com/qdm12/REPONAME_GITHUB/internal/models"
-	reflect "reflect"
 )
 
-// MockProcessor is a mock of Processor interface
+// MockProcessor is a mock of Processor interface.
 type MockProcessor struct {
 	ctrl     *gomock.Controller
 	recorder *MockProcessorMockRecorder
 }
 
-// MockProcessorMockRecorder is the mock recorder for MockProcessor
+// MockProcessorMockRecorder is the mock recorder for MockProcessor.
 type MockProcessorMockRecorder struct {
 	mock *MockProcessor
 }
 
-// NewMockProcessor creates a new mock instance
+// NewMockProcessor creates a new mock instance.
 func NewMockProcessor(ctrl *gomock.Controller) *MockProcessor {
 	mock := &MockProcessor{ctrl: ctrl}
 	mock.recorder = &MockProcessorMockRecorder{mock}
 	return mock
 }
 
-// EXPECT returns an object that allows the caller to indicate expected use
+// EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockProcessor) EXPECT() *MockProcessorMockRecorder {
 	return m.recorder
 }
 
-// CreateUser mocks base method
-func (m *MockProcessor) CreateUser(arg0 models.User) error {
+// CreateUser mocks base method.
+func (m *MockProcessor) CreateUser(arg0 context.Context, arg1 models.User) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateUser", arg0)
+	ret := m.ctrl.Call(m, "CreateUser", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CreateUser indicates an expected call of CreateUser
-func (mr *MockProcessorMockRecorder) CreateUser(arg0 interface{}) *gomock.Call {
+// CreateUser indicates an expected call of CreateUser.
+func (mr *MockProcessorMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockProcessor)(nil).CreateUser), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockProcessor)(nil).CreateUser), arg0, arg1)
 }
 
-// GetUserByID mocks base method
-func (m *MockProcessor) GetUserByID(arg0 uint64) (models.User, error) {
+// GetUserByID mocks base method.
+func (m *MockProcessor) GetUserByID(arg0 context.Context, arg1 uint64) (models.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserByID", arg0)
+	ret := m.ctrl.Call(m, "GetUserByID", arg0, arg1)
 	ret0, _ := ret[0].(models.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUserByID indicates an expected call of GetUserByID
-func (mr *MockProcessorMockRecorder) GetUserByID(arg0 interface{}) *gomock.Call {
+// GetUserByID indicates an expected call of GetUserByID.
+func (mr *MockProcessorMockRecorder) GetUserByID(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockProcessor)(nil).GetUserByID), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByID", reflect.TypeOf((*MockProcessor)(nil).GetUserByID), arg0, arg1)
 }

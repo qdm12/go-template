@@ -18,7 +18,7 @@ func (h *handler) getUserByID(w http.ResponseWriter, r *http.Request) {
 		httpBodyDecodeError(w, err)
 		return
 	}
-	user, err := h.proc.GetUserByID(body.ID)
+	user, err := h.proc.GetUserByID(r.Context(), body.ID)
 	if err != nil {
 		switch {
 		case errors.Is(err, dataerr.ErrGetUser):
@@ -54,7 +54,7 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 		httpBodyDecodeError(w, err)
 		return
 	}
-	if err := h.proc.CreateUser(body.User); err != nil {
+	if err := h.proc.CreateUser(r.Context(), body.User); err != nil {
 		switch {
 		case errors.Is(err, dataerr.ErrCreateUser):
 			h.logger.Error(err)

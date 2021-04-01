@@ -1,6 +1,8 @@
 package data
 
 import (
+	"context"
+
 	"github.com/qdm12/REPONAME_GITHUB/internal/config"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/json"
 	"github.com/qdm12/REPONAME_GITHUB/internal/data/memory"
@@ -11,8 +13,8 @@ import (
 
 type Database interface {
 	Close() error
-	CreateUser(user models.User) (err error)
-	GetUserByID(id uint64) (user models.User, err error)
+	CreateUser(ctx context.Context, user models.User) (err error)
+	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
 }
 
 func NewMemory() (Database, error) {

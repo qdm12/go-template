@@ -1,6 +1,7 @@
 package psql
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
@@ -9,8 +10,8 @@ import (
 )
 
 // CreateUser inserts a user in the database.
-func (db *Database) CreateUser(user models.User) (err error) {
-	_, err = db.sql.Exec(
+func (db *Database) CreateUser(ctx context.Context, user models.User) (err error) {
+	_, err = db.sql.ExecContext(ctx,
 		"INSERT INTO users(id, account, username, email) VALUES ($1,$2,$3,$4);",
 		user.ID,
 		user.Account,
@@ -24,8 +25,8 @@ func (db *Database) CreateUser(user models.User) (err error) {
 }
 
 // GetUserByID returns the user corresponding to a user ID from the database.
-func (db *Database) GetUserByID(id uint64) (user models.User, err error) {
-	row := db.sql.QueryRow(
+func (db *Database) GetUserByID(ctx context.Context, id uint64) (user models.User, err error) {
+	row := db.sql.QueryRowContext(ctx,
 		"SELECT account, email, username FROM users WHERE id = $1;",
 		id,
 	)
