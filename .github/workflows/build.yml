@@ -98,10 +98,10 @@ jobs:
             BUILD_DATE=${{ steps.vars.outputs.build_date }}
             COMMIT=${{ steps.vars.outputs.commit }}
             VERSION=${{ steps.vars.outputs.version }}
-          tags: qmcgaw/reponame_docker:${{ steps.vars.outputs.version }}
+          tags: qmcgaw/go-template-docker:${{ steps.vars.outputs.version }}
           push: true
 
       - if: github.event.ref == 'refs/heads/main'
         name: Microbadger hook
-        run: curl -X POST https://hooks.microbadger.com/images/qmcgaw/REPONAME_DOCKER/WEBHOOK_LINK
+        run: curl -X POST https://hooks.microbadger.com/images/qmcgaw/go-template-docker/WEBHOOK_LINK
         continue-on-error: true

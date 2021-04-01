@@ -5,10 +5,10 @@
 <img height="200" src="https://raw.githubusercontent.com/qdm12/go-template/main/title.svg?sanitize=true">
 
 [![Build status](https://github.com/qdm12/go-template/workflows/CI/badge.svg)](https://github.com/qdm12/go-template/actions?query=workflow%3ACI)
-[![Docker Pulls](https://img.shields.io/docker/pulls/qmcgaw/REPONAME_DOCKER.svg)](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER)
-[![Docker Stars](https://img.shields.io/docker/stars/qmcgaw/REPONAME_DOCKER.svg)](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER)
-[![Image size](https://images.microbadger.com/badges/image/qmcgaw/REPONAME_DOCKER.svg)](https://microbadger.com/images/qmcgaw/REPONAME_DOCKER)
-[![Image version](https://images.microbadger.com/badges/version/qmcgaw/REPONAME_DOCKER.svg)](https://microbadger.com/images/qmcgaw/REPONAME_DOCKER)
+[![Docker Pulls](https://img.shields.io/docker/pulls/qmcgaw/go-template-docker.svg)](https://hub.docker.com/r/qmcgaw/go-template-docker)
+[![Docker Stars](https://img.shields.io/docker/stars/qmcgaw/go-template-docker.svg)](https://hub.docker.com/r/qmcgaw/go-template-docker)
+[![Image size](https://images.microbadger.com/badges/image/qmcgaw/go-template-docker.svg)](https://microbadger.com/images/qmcgaw/go-template-docker)
+[![Image version](https://images.microbadger.com/badges/version/qmcgaw/go-template-docker.svg)](https://microbadger.com/images/qmcgaw/go-template-docker)
 
 [![Join Slack channel](https://img.shields.io/badge/slack-@qdm12-yellow.svg?logo=slack)](https://join.slack.com/t/qdm12/shared_invite/enQtOTE0NjcxNTM1ODc5LTYyZmVlOTM3MGI4ZWU0YmJkMjUxNmQ4ODQ2OTAwYzMxMTlhY2Q1MWQyOWUyNjc2ODliNjFjMDUxNWNmNzk5MDk)
 [![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/go-template.svg)](https://github.com/qdm12/go-template/commits/main)
@@ -18,14 +18,14 @@
 ## Features
 
 - Compatible with `amd64`, `386`, `arm64`, `arm32v7`, `arm32v6`, `ppc64le`, `s390x` and `riscv64` CPU architectures
-- [Docker image tags and sizes](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER/tags)
+- [Docker image tags and sizes](https://hub.docker.com/r/qmcgaw/go-template-docker/tags)
 
 ## Setup
 
 1. Use the following command:
 
     ```sh
-    docker run -d qmcgaw/REPONAME_DOCKER
+    docker run -d qmcgaw/go-template-docker
     ```
 
     You can also use [docker-compose.yml](https://github.com/qdm12/go-template/blob/main/docker-compose.yml) with:
@@ -34,7 +34,7 @@
     docker-compose up -d
     ```
 
-1. You can update the image with `docker pull qmcgaw/REPONAME_DOCKER:latest` or use one of [tags available](https://hub.docker.com/r/qmcgaw/REPONAME_DOCKER/tags)
+1. You can update the image with `docker pull qmcgaw/go-template-docker:latest` or use one of [tags available](https://hub.docker.com/r/qmcgaw/go-template-docker/tags)
 
 ### Environment variables
 
@@ -89,7 +89,7 @@
     # Lint the code
     golangci-lint run
     # Build the Docker image
-    docker build -t qmcgaw/REPONAME_DOCKER .
+    docker build -t qmcgaw/go-template-docker .
     ```
 
 1. See [Contributing](https://github.com/qdm12/go-template/main/.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
