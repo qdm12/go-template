@@ -37,7 +37,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 
 	configReader := config.NewReader()
 
@@ -58,8 +58,9 @@ func main() {
 	)
 
 	select {
-	case signal := <-signalsCh:
-		logger.Warn("Caught OS signal %s, shutting down\n", signal)
+	case <-ctx.Done():
+		logger.Warn("Caught OS signal, shutting down\n")
+		stop()
 	case err := <-errorCh:
 		close(errorCh)
 		if err == nil { // expected exit such as healthcheck
@@ -67,8 +68,6 @@ func main() {
 		}
 		logger.Error(err)
 	}
-
-	cancel()
 
 	const shutdownGracePeriod = 5 * time.Second
 	timer := time.NewTimer(shutdownGracePeriod)
