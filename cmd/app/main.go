@@ -41,11 +41,7 @@ func main() {
 
 	configReader := config.NewReader()
 
-	logger, err := logging.NewLogger(logging.ConsoleEncoding, logging.InfoLevel)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	logger := logging.New(logging.StdLog)
 
 	args := os.Args
 
@@ -111,10 +107,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return err
 	}
 
-	logger, err = logging.NewLogger(config.Log.Encoding, config.Log.Level)
-	if err != nil {
-		return err
-	}
+	logger = logger.NewChild(logging.SetLevel(config.Log.Level))
 
 	db, err := setupDatabase(config.Store, logger)
 	if err != nil {
@@ -127,7 +120,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	crypto := crypto.NewCrypto()
 	proc := processor.NewProcessor(db, crypto)
 
-	metricsLogger := logger.WithPrefix("metrics server: ")
+	metricsLogger := logger.NewChild(logging.SetPrefix("metrics server: "))
 	metricsServer := metrics.NewServer(config.Metrics.Address, metricsLogger)
 	const registerMetrics = true
 	metrics, err := metrics.New(registerMetrics)
@@ -137,15 +130,14 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	wg.Add(1)
 	go metricsServer.Run(ctx, wg, crashed)
 
-	serverLogger := logger.WithPrefix("http server: ")
+	serverLogger := logger.NewChild(logging.SetPrefix("http server: "))
 	server := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
 	wg.Add(1)
 	go server.Run(ctx, wg, crashed)
 
 	healthcheck := func() error { return nil }
-	healthServer := health.NewServer(
-		config.Health.Address, logger.WithPrefix("healthcheck: "),
-		healthcheck)
+	heathcheckLogger := logger.NewChild(logging.SetPrefix("healthcheck: "))
+	healthServer := health.NewServer(config.Health.Address, heathcheckLogger, healthcheck)
 	wg.Add(1)
 	go healthServer.Run(ctx, wg)
 
