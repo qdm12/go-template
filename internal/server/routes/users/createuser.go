@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	dataerr "github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/models"
 	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
 	"github.com/qdm12/go-template/internal/server/decodejson"
@@ -29,13 +28,9 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.proc.CreateUser(r.Context(), user); err != nil {
-		switch {
-		case errors.Is(err, dataerr.ErrCreateUser):
-			h.logger.Error(err)
-			errResponder.Respond(w, http.StatusInternalServerError, "")
-		case errors.Is(err, context.DeadlineExceeded):
+		if errors.Is(err, context.DeadlineExceeded) {
 			errResponder.Respond(w, http.StatusRequestTimeout, "")
-		default:
+		} else {
 			h.logger.Error(err)
 			errResponder.Respond(w, http.StatusInternalServerError, "")
 		}

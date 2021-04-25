@@ -34,9 +34,6 @@ func (h *handler) getUserByID(w http.ResponseWriter, r *http.Request) {
 	user, err := h.proc.GetUserByID(r.Context(), id)
 	if err != nil {
 		switch {
-		case errors.Is(err, dataerr.ErrGetUser):
-			h.logger.Error(err)
-			errResponder.Respond(w, http.StatusInternalServerError, "")
 		case errors.Is(err, dataerr.ErrUserNotFound):
 			errResponder.Respond(w, http.StatusNotFound, err.Error())
 		case errors.Is(err, context.DeadlineExceeded):

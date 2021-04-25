@@ -2,6 +2,7 @@ package health
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -27,16 +28,21 @@ func NewClient() Client {
 	}
 }
 
+var (
+	ErrQuery     = errors.New("cannot query health server")
+	ErrUnhealthy = errors.New("unhealthy")
+)
+
 // Query sends an HTTP request to the other instance of
 // the program, and to its internal healthcheck server.
 func (c *client) Query(ctx context.Context) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://127.0.0.1:9999", nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %s", ErrQuery, err)
 	}
 	resp, err := c.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %s", ErrQuery, err)
 	} else if resp.StatusCode == http.StatusOK {
 		return nil
 	}
@@ -44,7 +50,7 @@ func (c *client) Query(ctx context.Context) error {
 	b, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return fmt.Errorf("%s: %s", resp.Status, err)
+		return fmt.Errorf("%w: %s: %s", ErrUnhealthy, resp.Status, err)
 	}
-	return fmt.Errorf("%s (%s)", string(b), err)
+	return fmt.Errorf("%w: %s", ErrUnhealthy, string(b))
 }

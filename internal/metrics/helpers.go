@@ -1,9 +1,15 @@
 package metrics
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+)
+
+var (
+	ErrRegister = errors.New("registration error")
 )
 
 func newCounterVec(name, help string, labelNames []string, register bool) (c *prometheus.CounterVec, err error) {
@@ -14,9 +20,11 @@ func newCounterVec(name, help string, labelNames []string, register bool) (c *pr
 		Help:      help,
 	}, labelNames)
 	if register {
-		err = prometheus.Register(c)
+		if err := prometheus.Register(c); err != nil {
+			return nil, fmt.Errorf("%w: %s", ErrRegister, err)
+		}
 	}
-	return c, err
+	return c, nil
 }
 
 func newGauge(name, help string, register bool) (g prometheus.Gauge, err error) {
@@ -27,14 +35,16 @@ func newGauge(name, help string, register bool) (g prometheus.Gauge, err error) 
 		Help:      help,
 	})
 	if register {
-		err = prometheus.Register(g)
+		if err := prometheus.Register(g); err != nil {
+			return nil, fmt.Errorf("%w: %s", ErrRegister, err)
+		}
 	}
-	return g, err
+	return g, nil
 }
 
 func newHistogramVec(name, help string, buckets []float64, labelNames []string, register bool) (
-	histogram *prometheus.HistogramVec, err error) {
-	histogram = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	h *prometheus.HistogramVec, err error) {
+	h = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: promNamespace,
 		Subsystem: promSubsystem,
 		Name:      name,
@@ -42,9 +52,11 @@ func newHistogramVec(name, help string, buckets []float64, labelNames []string, 
 		Buckets:   buckets,
 	}, labelNames)
 	if register {
-		err = prometheus.Register(histogram)
+		if err := prometheus.Register(h); err != nil {
+			return nil, fmt.Errorf("%w: %s", ErrRegister, err)
+		}
 	}
-	return histogram, err
+	return h, nil
 }
 
 func newResponseTimeHistogramVec(register bool) (responseTimeHistogram *prometheus.HistogramVec, err error) {

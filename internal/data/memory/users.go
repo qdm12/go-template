@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/qdm12/go-template/internal/data/errors"
+	dataerrors "github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/models"
 )
 
@@ -23,5 +23,5 @@ func (db *Database) GetUserByID(_ context.Context, id uint64) (user models.User,
 			return user, nil
 		}
 	}
-	return user, fmt.Errorf("%w: for id %d", errors.ErrUserNotFound, id)
+	return user, fmt.Errorf("%w: for id %d", dataerrors.ErrUserNotFound, id)
 }

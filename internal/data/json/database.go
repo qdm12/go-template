@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/qdm12/go-template/internal/data/errors"
+	dataerrors "github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/data/memory"
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/golibs/files"
@@ -30,21 +30,21 @@ func NewDatabase(memory *memory.Database, filepath string) (*Database, error) {
 		fileManager: files.NewFileManager()}
 	exists, err := db.fileManager.FileExists(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
+		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
 	} else if !exists {
 		if err := db.fileManager.Touch(filepath); err != nil {
-			return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
+			return nil, fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
 		}
 	}
 	rawData, err := db.fileManager.ReadFile(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
+		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
 	} else if len(rawData) == 0 {
 		if err := db.writeFile(); err != nil {
-			return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
+			return nil, fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
 		}
 	} else if err := db.readFile(); err != nil {
-		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
+		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
 	}
 	return &db, nil
 }
@@ -63,10 +63,10 @@ func (db *Database) writeFile() error {
 	defer db.Unlock()
 	b, err := json.Marshal(db.memory.GetData())
 	if err != nil {
-		return fmt.Errorf("%w: %s", errors.ErrWriteFile, err)
+		return fmt.Errorf("%w: %s", dataerrors.ErrEncoding, err)
 	}
 	if err := db.fileManager.WriteToFile(db.filepath, b); err != nil {
-		return fmt.Errorf("%w: %s", errors.ErrWriteFile, err)
+		return fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
 	}
 	return nil
 }
@@ -75,11 +75,11 @@ func (db *Database) writeFile() error {
 func (db *Database) readFile() error {
 	b, err := db.fileManager.ReadFile(db.filepath)
 	if err != nil {
-		return fmt.Errorf("%w: %s", errors.ErrReadFile, err)
+		return fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
 	}
 	var data models.Data
 	if err := json.Unmarshal(b, &data); err != nil {
-		return fmt.Errorf("%w: %s", errors.ErrReadFile, err)
+		return fmt.Errorf("%w: %s", dataerrors.ErrDecoding, err)
 	}
 	db.memory.SetData(data)
 	return nil

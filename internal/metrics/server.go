@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"sync"
 	"time"
@@ -45,7 +46,7 @@ func (s *server) Run(ctx context.Context, wg *sync.WaitGroup, crashed chan<- err
 
 	s.logger.Info("listening on %s", s.address)
 	err := server.ListenAndServe()
-	if err != nil && ctx.Err() != context.Canceled { // server crashed
+	if err != nil && !errors.Is(ctx.Err(), context.Canceled) { // server crashed
 		crashed <- err
 	}
 }

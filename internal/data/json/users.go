@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/models"
 )
 
@@ -13,7 +12,7 @@ func (db *Database) CreateUser(ctx context.Context, user models.User) (err error
 		return err
 	}
 	if err := db.writeFile(); err != nil {
-		return fmt.Errorf("%w: for user %#v: %s", errors.ErrCreateUser, user, err)
+		return fmt.Errorf("%w: for user %#v", err, user)
 	}
 	return nil
 }

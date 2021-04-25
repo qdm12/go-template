@@ -2,8 +2,15 @@ package processor
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
+	dataerr "github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/models"
+)
+
+var (
+	ErrUserNotFound = errors.New("user not found")
 )
 
 func (p *processor) CreateUser(ctx context.Context, user models.User) error {
@@ -11,5 +18,9 @@ func (p *processor) CreateUser(ctx context.Context, user models.User) error {
 }
 
 func (p *processor) GetUserByID(ctx context.Context, id uint64) (user models.User, err error) {
-	return p.db.GetUserByID(ctx, id)
+	user, err = p.db.GetUserByID(ctx, id)
+	if errors.Is(err, dataerr.ErrUserNotFound) {
+		err = fmt.Errorf("%w: %s", ErrUserNotFound, errors.Unwrap(err))
+	}
+	return user, err
 }

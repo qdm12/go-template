@@ -3,9 +3,10 @@ package psql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
-	"github.com/qdm12/go-template/internal/data/errors"
+	dataerrors "github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/models"
 )
 
@@ -19,7 +20,7 @@ func (db *Database) CreateUser(ctx context.Context, user models.User) (err error
 		user.Email,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %s", errors.ErrCreateUser, err)
+		return err
 	}
 	return nil
 }
@@ -32,10 +33,10 @@ func (db *Database) GetUserByID(ctx context.Context, id uint64) (user models.Use
 	)
 	user.ID = id
 	err = row.Scan(&user.Account, &user.Email, &user.Username)
-	if err == sql.ErrNoRows {
-		return user, fmt.Errorf("%w: for id %d", errors.ErrUserNotFound, id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return user, fmt.Errorf("%w: for id %d", dataerrors.ErrUserNotFound, id)
 	} else if err != nil {
-		return user, fmt.Errorf("%w: for id %d: %s", errors.ErrGetUser, id, err)
+		return user, fmt.Errorf("%w: for id %d", err, id)
 	}
 	return user, nil
 }

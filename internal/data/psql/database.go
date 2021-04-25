@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/qdm12/go-template/internal/config"
-	"github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/golibs/crypto/random"
 	"github.com/qdm12/golibs/logging"
 )
@@ -26,11 +25,12 @@ func NewDatabase(config config.Postgres, logger logging.Logger) (*Database, erro
 		"@" + config.Address + "/" + config.Address + "?sslmode=disable&connect_timeout=1"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
+		return nil, err
 	}
 	fails := 0
 	const maxFails = 3
 	const sleepDuration = 200 * time.Millisecond
+	var totalTryTime time.Duration
 	for {
 		err = db.Ping()
 		if err == nil {
@@ -38,9 +38,10 @@ func NewDatabase(config config.Postgres, logger logging.Logger) (*Database, erro
 		}
 		fails++
 		if fails == maxFails {
-			return nil, fmt.Errorf("%w: %s", errors.ErrCreation, err)
+			return nil, fmt.Errorf("failed connecting to database after %d tries in %s: %w", fails, totalTryTime, err)
 		}
 		time.Sleep(sleepDuration)
+		totalTryTime += sleepDuration
 	}
 	return &Database{db, logger, random.NewRandom()}, nil
 }
@@ -48,7 +49,7 @@ func NewDatabase(config config.Postgres, logger logging.Logger) (*Database, erro
 // Close closes the database and prevents new queries from starting.
 func (db *Database) Close() error {
 	if err := db.sql.Close(); err != nil {
-		return fmt.Errorf("%w: %s", errors.ErrClose, err)
+		return err
 	}
 	return nil
 }
