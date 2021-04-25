@@ -10,6 +10,7 @@ issues:
       linters:
         - dupl
         - maligned
+        - goerr113
     - path: cmd/
       text: commit is a global variable
       linters:
@@ -38,6 +39,7 @@ linters:
     - gocritic
     - gocyclo
     - godot
+    - goerr113
     - goheader
     - goimports
     - golint
@@ -47,20 +49,23 @@ linters:
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
+    - makezero
     - maligned
     - misspell
     - nakedret
     - nestif
     - noctx
     - nolintlint
+    # - paralleltest
     - prealloc
     - rowserrcheck
-    - scopelint
+    - exportloopref
     - sqlclosecheck
     - staticcheck
     - structcheck
+    - thelper
+    - tparallel
     - typecheck
     - unconvert
     - unparam
