@@ -1,3 +1,5 @@
+// Package metrics implements a metrics middleware for an HTTP server
+// that records metrics data for Prometheus.
 package metrics
 
 import (
