@@ -50,13 +50,6 @@ func main() {
 		errorCh <- _main(ctx, buildInfo, args, logger, configReader)
 	}()
 
-	signalsCh := make(chan os.Signal, 1)
-	signal.Notify(signalsCh,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-		os.Interrupt,
-	)
-
 	select {
 	case <-ctx.Done():
 		logger.Warn("Caught OS signal, shutting down\n")
