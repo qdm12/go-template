@@ -19,7 +19,6 @@ import (
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
 	"github.com/qdm12/go-template/internal/splash"
-	"github.com/qdm12/golibs/crypto"
 	"github.com/qdm12/golibs/logging"
 )
 
@@ -109,8 +108,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	wg := &sync.WaitGroup{}
 	crashed := make(chan error)
 
-	crypto := crypto.NewCrypto()
-	proc := processor.NewProcessor(db, crypto)
+	proc := processor.NewProcessor(db)
 
 	metricsLogger := logger.NewChild(logging.Settings{Prefix: "metrics server: "})
 	metricsServer := metrics.NewServer(config.Metrics.Address, metricsLogger)

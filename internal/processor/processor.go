@@ -8,7 +8,6 @@ import (
 
 	"github.com/qdm12/go-template/internal/data"
 	"github.com/qdm12/go-template/internal/models"
-	"github.com/qdm12/golibs/crypto"
 )
 
 //go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Processor
@@ -20,11 +19,12 @@ type Processor interface {
 }
 
 type processor struct {
-	db     data.Database
-	crypto crypto.Crypto
+	db data.Database
 }
 
 // NewProcessor creates a new processor object.
-func NewProcessor(db data.Database, crypto crypto.Crypto) Processor {
-	return &processor{db, crypto}
+func NewProcessor(db data.Database) Processor {
+	return &processor{
+		db: db,
+	}
 }
