@@ -41,7 +41,7 @@ func main() {
 
 	configReader := config.NewReader()
 
-	logger := logging.New(logging.StdLog)
+	logger := logging.NewParent(logging.Settings{})
 
 	args := os.Args
 
@@ -78,7 +78,7 @@ func main() {
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger logging.Logger, configReader config.Reader) error {
+	args []string, logger logging.ParentLogger, configReader config.Reader) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {
@@ -99,7 +99,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return err
 	}
 
-	logger = logger.NewChild(logging.SetLevel(config.Log.Level))
+	logger = logger.NewChild(logging.Settings{Level: config.Log.Level})
 
 	db, err := setupDatabase(config.Store, logger)
 	if err != nil {
@@ -112,7 +112,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	crypto := crypto.NewCrypto()
 	proc := processor.NewProcessor(db, crypto)
 
-	metricsLogger := logger.NewChild(logging.SetPrefix("metrics server: "))
+	metricsLogger := logger.NewChild(logging.Settings{Prefix: "metrics server: "})
 	metricsServer := metrics.NewServer(config.Metrics.Address, metricsLogger)
 	const registerMetrics = true
 	metrics, err := metrics.New(registerMetrics)
@@ -122,13 +122,13 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	wg.Add(1)
 	go metricsServer.Run(ctx, wg, crashed)
 
-	serverLogger := logger.NewChild(logging.SetPrefix("http server: "))
+	serverLogger := logger.NewChild(logging.Settings{Prefix: "http server: "})
 	server := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
 	wg.Add(1)
 	go server.Run(ctx, wg, crashed)
 
 	healthcheck := func() error { return nil }
-	heathcheckLogger := logger.NewChild(logging.SetPrefix("healthcheck: "))
+	heathcheckLogger := logger.NewChild(logging.Settings{Prefix: "healthcheck: "})
 	healthServer := health.NewServer(config.Health.Address, heathcheckLogger, healthcheck)
 	wg.Add(1)
 	go healthServer.Run(ctx, wg)
