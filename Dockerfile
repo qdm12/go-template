@@ -13,21 +13,21 @@ RUN go mod download
 COPY cmd/ ./cmd/
 COPY internal/ ./internal/
 
-FROM --platform=$BUILDPLATFORM base AS test
+FROM base AS test
 # Note on the go race detector:
 # - we set CGO_ENABLED=1 to have it enabled
 # - we install g++ to support the race detector
 ENV CGO_ENABLED=1
 RUN apk -q --update --no-cache add g++
 
-FROM --platform=$BUILDPLATFORM base AS lint
+FROM base AS lint
 ARG GOLANGCI_LINT_VERSION=v1.35.2
 RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
     sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
 COPY .golangci.yml ./
 RUN golangci-lint run --timeout=10m
 
-FROM --platform=$BUILDPLATFORM base AS tidy
+FROM base AS tidy
 RUN git init && \
     git config user.email ci@localhost && \
     git config user.name ci && \
@@ -36,7 +36,7 @@ RUN git init && \
     go mod tidy && \
     git diff --exit-code -- go.mod
 
-FROM --platform=$BUILDPLATFORM base AS build
+FROM base AS build
 COPY --from=qmcgaw/xcputranslate:v0.4.0 /xcputranslate /usr/local/bin/xcputranslate
 ARG TARGETPLATFORM
 ARG VERSION=unknown
