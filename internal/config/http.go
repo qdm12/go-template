@@ -39,7 +39,7 @@ func (h *HTTP) get(env params.Env) (warning string, err error) {
 func (h *HTTP) getAddress(env params.Env) (address, warning string, err error) {
 	const envKey = "HTTP_SERVER_ADDRESS"
 	options := []params.OptionSetter{
-		params.Default("0.0.0.0:8000"),
+		params.Default(":8000"),
 	}
 	return env.ListeningAddress(envKey, options...)
 }

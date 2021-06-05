@@ -58,12 +58,12 @@ COPY --from=alpine --chown=1000 /usr/share/zoneinfo /usr/share/zoneinfo
 ENTRYPOINT ["/app"]
 EXPOSE 8000/tcp
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=2 CMD ["/app","healthcheck"]
-ENV HTTP_SERVER_ADDRESS=0.0.0.0:8000 \
+ENV HTTP_SERVER_ADDRESS=:8000 \
     HTTP_SERVER_ROOT_URL=/ \
     HTTP_SERVER_LOG_REQUESTS=on \
     HTTP_SERVER_ALLOWED_ORIGINS= \
     HTTP_SERVER_ALLOWED_HEADERS= \
-    METRICS_SERVER_ADDRESS=0.0.0.0:9090 \
+    METRICS_SERVER_ADDRESS=:9090 \
     LOG_LEVEL=info \
     STORE_TYPE=memory \
     STORE_JSON_FILEPATH=data.json \

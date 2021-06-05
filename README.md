@@ -40,12 +40,12 @@
 
 | Environment variable | Default | Possible values | Description |
 | --- | --- | --- | --- |
-| `HTTP_SERVER_ADDRESS` | `0.0.0.0:8000` | Valid address | HTTP server listening address |
+| `HTTP_SERVER_ADDRESS` | `:8000` | Valid address | HTTP server listening address |
 | `HTTP_SERVER_ROOT_URL` | `/` | URL path | HTTP server root URL |
 | `HTTP_SERVER_LOG_REQUESTS` | `on` | `on` or `off` | Log requests and responses information |
 | `HTTP_SERVER_ALLOWED_ORIGINS` | | CSV of addresses | Comma separated list of addresses to allow for CORS |
 | `HTTP_SERVER_ALLOWED_HEADERS` | | CSV of HTTP header keys | Comma separated list of header keys to allow for CORS |
-| `METRICS_SERVER_ADDRESS` | `0.0.0.0:9090` | Valid address | Prometheus HTTP server listening address |
+| `METRICS_SERVER_ADDRESS` | `:9090` | Valid address | Prometheus HTTP server listening address |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warning`, `error` | Logging level |
 | `STORE_TYPE` | `memory` | `memory`, `json` or `postgres` | Data store type |
 | `STORE_JSON_FILEPATH` | `data.json` | Valid filepath | JSON file to use if `STORE_TYPE=json` |
