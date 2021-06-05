@@ -7,7 +7,7 @@ ARG GO_VERSION=1.16
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 RUN apk --update add git g++
 ENV CGO_ENABLED=0
-ARG GOLANGCI_LINT_VERSION=v1.35.2
+ARG GOLANGCI_LINT_VERSION=v1.40.1
 RUN go get github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
 COPY --from=qmcgaw/xcputranslate:v0.4.0 /xcputranslate /usr/local/bin/xcputranslate
 WORKDIR /tmp/gobuild
