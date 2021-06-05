@@ -1,13 +1,16 @@
-ARG ALPINE_VERSION=3.13
-ARG GO_VERSION=1.16
 # Sets linux/amd64 in case it's not injected by older Docker versions
 ARG BUILDPLATFORM=linux/amd64
 
+ARG ALPINE_VERSION=3.13
+ARG GO_VERSION=1.16
+
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
-RUN apk --update add git
+RUN apk --update add git g++
 ENV CGO_ENABLED=0
+ARG GOLANGCI_LINT_VERSION=v1.35.2
+RUN go get github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
+COPY --from=qmcgaw/xcputranslate:v0.4.0 /xcputranslate /usr/local/bin/xcputranslate
 WORKDIR /tmp/gobuild
-# Copy repository code and install Go dependencies
 COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd/ ./cmd/
@@ -16,14 +19,10 @@ COPY internal/ ./internal/
 FROM base AS test
 # Note on the go race detector:
 # - we set CGO_ENABLED=1 to have it enabled
-# - we install g++ to support the race detector
+# - we installed g++ in the base stage to support the race detector
 ENV CGO_ENABLED=1
-RUN apk -q --update --no-cache add g++
 
 FROM base AS lint
-ARG GOLANGCI_LINT_VERSION=v1.35.2
-RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | \
-    sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
 COPY .golangci.yml ./
 RUN golangci-lint run --timeout=10m
 
@@ -37,7 +36,6 @@ RUN git init && \
     git diff --exit-code -- go.mod
 
 FROM base AS build
-COPY --from=qmcgaw/xcputranslate:v0.4.0 /xcputranslate /usr/local/bin/xcputranslate
 ARG TARGETPLATFORM
 ARG VERSION=unknown
 ARG BUILD_DATE="an unknown date"
