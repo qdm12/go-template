@@ -9,6 +9,7 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	_ "time/tzdata"
 
 	_ "github.com/lib/pq"
 	"github.com/qdm12/go-template/internal/config"

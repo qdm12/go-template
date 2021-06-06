@@ -49,12 +49,11 @@ RUN GOARCH="$(xcputranslate -targetplatform=${TARGETPLATFORM} -field arch)" \
     " -o app cmd/app/main.go
 
 FROM --platform=$BUILDPLATFORM alpine:${ALPINE_VERSION} AS alpine
-RUN apk --update add ca-certificates tzdata
+RUN apk --update add ca-certificates
 
 FROM scratch
 USER 1000
 COPY --from=alpine --chown=1000 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=alpine --chown=1000 /usr/share/zoneinfo /usr/share/zoneinfo
 ENTRYPOINT ["/app"]
 EXPOSE 8000/tcp
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=2 CMD ["/app","healthcheck"]
