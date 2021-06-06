@@ -21,7 +21,7 @@ func newRouter(config config.HTTP, logger logging.Logger,
 	proc processor.Processor) http.Handler {
 	router := chi.NewRouter()
 
-	// Middlwares
+	// Middlewares
 	logMiddleware := logmware.New(logger, config.LogRequests)
 	metricsMiddleware := metricsmware.New(metrics)
 	corsMiddleware := cors.New(config.AllowedOrigins, config.AllowedHeaders)

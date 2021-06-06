@@ -34,7 +34,7 @@
     docker-compose up -d
     ```
 
-1. You can update the image with `docker pull qmcgaw/go-template-docker:latest` or use one of [tags available](https://hub.docker.com/r/qmcgaw/go-template-docker/tags)
+1. You can update the image with `docker pull qmcgaw/go-template-docker:latest` or use one of the [tags available](https://hub.docker.com/r/qmcgaw/go-template-docker/tags)
 
 ### Environment variables
 
