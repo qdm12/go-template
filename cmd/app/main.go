@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 	_ "time/tzdata"
@@ -19,6 +18,7 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
+	"github.com/qdm12/go-template/internal/shutdown"
 	"github.com/qdm12/go-template/internal/splash"
 	"github.com/qdm12/golibs/logging"
 )
@@ -99,15 +99,15 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return err
 	}
 
+	shutdownServersGroup := shutdown.NewGroup("servers: ")
+	shutdownStoreGroup := shutdown.NewGroup("store: ")
+
 	logger = logger.NewChild(logging.Settings{Level: config.Log.Level})
 
 	db, err := setupDatabase(config.Store, logger)
 	if err != nil {
 		return err
 	}
-
-	wg := &sync.WaitGroup{}
-	crashed := make(chan error)
 
 	proc := processor.NewProcessor(db)
 
@@ -118,30 +118,51 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	if err != nil {
 		return err
 	}
-	wg.Add(1)
-	go metricsServer.Run(ctx, wg, crashed)
+	metricsServerCtx, metricsServerDone := shutdownServersGroup.Add("metrics", time.Second)
+	go func() {
+		defer close(metricsServerDone)
+		if err := metricsServer.Run(metricsServerCtx); err != nil {
+			logger.Error(err.Error())
+		}
+	}()
 
 	serverLogger := logger.NewChild(logging.Settings{Prefix: "http server: "})
-	server := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
-	wg.Add(1)
-	go server.Run(ctx, wg, crashed)
+	mainServer := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
+	serverCtx, serverDone := shutdownServersGroup.Add("server", time.Second)
+	go func() {
+		defer close(serverDone)
+		if err := mainServer.Run(serverCtx); err != nil {
+			logger.Error(err.Error())
+			if errors.Is(err, server.ErrCrashed) {
+				cancel() // stop other routines
+			}
+		}
+	}()
 
 	healthcheck := func() error { return nil }
 	heathcheckLogger := logger.NewChild(logging.Settings{Prefix: "healthcheck: "})
 	healthServer := health.NewServer(config.Health.Address, heathcheckLogger, healthcheck)
-	wg.Add(1)
-	go healthServer.Run(ctx, wg)
+	healthServerCtx, healthServerDone := shutdownServersGroup.Add("health", time.Second)
+	go func() {
+		defer close(healthServerDone)
+		if err := healthServer.Run(healthServerCtx); err != nil {
+			logger.Error(err.Error())
+		}
+	}()
 
-	select {
-	case <-ctx.Done():
-		wg.Wait()
-		return db.Close()
-	case err := <-crashed:
-		cancel()
-		wg.Wait()
-		_ = db.Close()
-		return err
-	}
+	// Adapt db.Close to the shutdown logic
+	dbCloseCtx, dbCloseDone := shutdownStoreGroup.Add("close", time.Second)
+	go func() {
+		<-dbCloseCtx.Done()
+		db.Close()
+		close(dbCloseDone)
+	}()
+
+	shutdownOrder := shutdown.NewOrder()
+	shutdownOrder.Append(shutdownServersGroup, shutdownStoreGroup)
+
+	<-ctx.Done()
+	return shutdownOrder.Shutdown(time.Second, logger)
 }
 
 var errDatabaseTypeUnknown = errors.New("database type is unknown")

@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -43,9 +42,7 @@ func Test_server_Run(t *testing.T) {
 	const address = "127.0.0.1:9000"
 
 	logger := mock_logging.NewMockLogger(ctrl)
-	logger.EXPECT().Info("listening on %s", address)
-	logger.EXPECT().Warn("context canceled: shutting down")
-	logger.EXPECT().Warn("shut down")
+	logger.EXPECT().Info("listening on " + address)
 
 	server := &server{
 		address: address,
@@ -54,12 +51,13 @@ func Test_server_Run(t *testing.T) {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-	wg.Add(1)
-	crashed := make(chan error)
+	errCh := make(chan error)
 
-	go server.Run(ctx, wg, crashed)
+	go func() {
+		errCh <- server.Run(ctx)
+	}()
 
 	cancel()
+	err := <-errCh
+	assert.NoError(t, err)
 }
