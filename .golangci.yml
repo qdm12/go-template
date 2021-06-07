@@ -42,12 +42,12 @@ linters:
     - goerr113
     - goheader
     - goimports
-    - golint
     - gomnd
     - goprintffuncname
     - gosec
     - gosimple
     - govet
+    - importas
     - ineffassign
     - lll
     - makezero
@@ -55,12 +55,13 @@ linters:
     - misspell
     - nakedret
     - nestif
+    - nilerr
     - noctx
     - nolintlint
-    # - paralleltest
     - prealloc
+    - predeclared
+    - revive
     - rowserrcheck
-    - exportloopref
     - sqlclosecheck
     - staticcheck
     - structcheck
