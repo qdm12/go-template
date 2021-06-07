@@ -14,7 +14,7 @@ func IsClientMode(args []string) bool {
 }
 
 type Client interface {
-	Query(ctx context.Context) error
+	Query(ctx context.Context, address string) error
 }
 
 type client struct {
@@ -35,8 +35,8 @@ var (
 
 // Query sends an HTTP request to the other instance of
 // the program, and to its internal healthcheck server.
-func (c *client) Query(ctx context.Context) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://127.0.0.1:9999", nil)
+func (c *client) Query(ctx context.Context, address string) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address, nil)
 	if err != nil {
 		return fmt.Errorf("%w: %s", ErrQuery, err)
 	}
