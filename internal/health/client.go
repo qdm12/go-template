@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"time"
 )
@@ -29,14 +30,20 @@ func NewClient() Client {
 }
 
 var (
-	ErrQuery     = errors.New("cannot query health server")
-	ErrUnhealthy = errors.New("unhealthy")
+	ErrParseHealthServerAddress = errors.New("cannot parse health server address")
+	ErrQuery                    = errors.New("cannot query health server")
+	ErrUnhealthy                = errors.New("unhealthy")
 )
 
 // Query sends an HTTP request to the other instance of
 // the program, and to its internal healthcheck server.
 func (c *client) Query(ctx context.Context, address string) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://"+address, nil)
+	_, port, err := net.SplitHostPort(address)
+	if err != nil {
+		return fmt.Errorf("%w: %s: %s", ErrParseHealthServerAddress, address, err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://127.0.0.1:"+port, nil)
 	if err != nil {
 		return fmt.Errorf("%w: %s", ErrQuery, err)
 	}
