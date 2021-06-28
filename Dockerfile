@@ -3,13 +3,16 @@ ARG BUILDPLATFORM=linux/amd64
 
 ARG ALPINE_VERSION=3.13
 ARG GO_VERSION=1.16
+ARG XCPUTRANSLATE_VERSION=v0.6.0
+
+FROM --platform=${BUILDPLATFORM} qmcgaw/xcputranslate:${XCPUTRANSLATE_VERSION} AS xcputranslate
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
 RUN apk --update add git g++
 ENV CGO_ENABLED=0
 ARG GOLANGCI_LINT_VERSION=v1.40.1
 RUN go get github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
-COPY --from=qmcgaw/xcputranslate:v0.6.0 /xcputranslate /usr/local/bin/xcputranslate
+COPY --from=xcputranslate /xcputranslate /usr/local/bin/xcputranslate
 WORKDIR /tmp/gobuild
 COPY go.mod go.sum ./
 RUN go mod download
