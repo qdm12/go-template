@@ -10,11 +10,11 @@ FROM --platform=${BUILDPLATFORM} qmcgaw/xcputranslate:${XCPUTRANSLATE_VERSION} A
 FROM --platform=${BUILDPLATFORM} qmcgaw/binpot:golangci-lint-${GOLANGCI_LINT_VERSION} AS golangci-lint
 
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION}-alpine${ALPINE_VERSION} AS base
-RUN apk --update add git g++
 ENV CGO_ENABLED=0
+WORKDIR /tmp/gobuild
+RUN apk --update add git g++
 COPY --from=xcputranslate /xcputranslate /usr/local/bin/xcputranslate
 COPY --from=golangci-lint /bin /go/bin/golangci-lint
-WORKDIR /tmp/gobuild
 COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd/ ./cmd/
