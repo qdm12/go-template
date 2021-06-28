@@ -30,6 +30,3 @@ services:
       # For debugging with dlv
       - seccomp:unconfined
     entrypoint: zsh -c "while sleep 1000; do :; done"
-    ports:
-      - 8000:8000/tcp
-      - 9090:9090/tcp
