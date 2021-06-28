@@ -9,7 +9,7 @@ RUN apk --update add git g++
 ENV CGO_ENABLED=0
 ARG GOLANGCI_LINT_VERSION=v1.40.1
 RUN go get github.com/golangci/golangci-lint/cmd/golangci-lint@${GOLANGCI_LINT_VERSION}
-COPY --from=qmcgaw/xcputranslate:v0.4.0 /xcputranslate /usr/local/bin/xcputranslate
+COPY --from=qmcgaw/xcputranslate:v0.6.0 /xcputranslate /usr/local/bin/xcputranslate
 WORKDIR /tmp/gobuild
 COPY go.mod go.sum ./
 RUN go mod download
@@ -40,8 +40,8 @@ ARG TARGETPLATFORM
 ARG VERSION=unknown
 ARG BUILD_DATE="an unknown date"
 ARG COMMIT=unknown
-RUN GOARCH="$(xcputranslate -targetplatform=${TARGETPLATFORM} -field arch)" \
-    GOARM="$(xcputranslate -targetplatform=${TARGETPLATFORM} -field arm)" \
+RUN GOARCH="$(xcputranslate translate -targetplatform=${TARGETPLATFORM} -field arch)" \
+    GOARM="$(xcputranslate translate -targetplatform=${TARGETPLATFORM} -field arm)" \
     go build -trimpath -ldflags="-s -w \
     -X 'main.version=$VERSION' \
     -X 'main.buildDate=$BUILD_DATE' \
