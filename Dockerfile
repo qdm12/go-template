@@ -25,6 +25,7 @@ FROM base AS test
 # - we set CGO_ENABLED=1 to have it enabled
 # - we installed g++ in the base stage to support the race detector
 ENV CGO_ENABLED=1
+ENTRYPOINT go test -race -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
 
 FROM base AS lint
 COPY .golangci.yml ./
