@@ -8,5 +8,6 @@ require (
 	github.com/lib/pq v1.10.2
 	github.com/prometheus/client_golang v1.11.0
 	github.com/qdm12/golibs v0.0.0-20210603202746-e5494e9c2ebb
+	github.com/qdm12/goshutdown v0.1.0
 	github.com/stretchr/testify v1.7.0
 )

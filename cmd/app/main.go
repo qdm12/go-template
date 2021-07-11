@@ -18,9 +18,9 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
-	"github.com/qdm12/go-template/internal/shutdown"
 	"github.com/qdm12/go-template/internal/splash"
 	"github.com/qdm12/golibs/logging"
+	"github.com/qdm12/goshutdown"
 )
 
 var (
@@ -105,9 +105,6 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return err
 	}
 
-	shutdownServersGroup := shutdown.NewGroup("servers: ")
-	shutdownStoreGroup := shutdown.NewGroup("store: ")
-
 	logger = logger.NewChild(logging.Settings{Level: config.Log.Level})
 
 	db, err := setupDatabase(config.Store, logger)
@@ -124,7 +121,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	if err != nil {
 		return err
 	}
-	metricsServerCtx, metricsServerDone := shutdownServersGroup.Add("metrics", time.Second)
+	metricsServerHandler, metricsServerCtx, metricsServerDone := goshutdown.NewGoRoutineHandler(
+		"metrics", goshutdown.GoRoutineSettings{})
 	go func() {
 		defer close(metricsServerDone)
 		if err := metricsServer.Run(metricsServerCtx); err != nil {
@@ -134,7 +132,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 	serverLogger := logger.NewChild(logging.Settings{Prefix: "http server: "})
 	mainServer := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
-	serverCtx, serverDone := shutdownServersGroup.Add("server", time.Second)
+	serverHandler, serverCtx, serverDone := goshutdown.NewGoRoutineHandler(
+		"server", goshutdown.GoRoutineSettings{})
 	go func() {
 		defer close(serverDone)
 		if err := mainServer.Run(serverCtx); err != nil {
@@ -148,7 +147,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	healthcheck := func() error { return nil }
 	heathcheckLogger := logger.NewChild(logging.Settings{Prefix: "healthcheck: "})
 	healthServer := health.NewServer(config.Health.Address, heathcheckLogger, healthcheck)
-	healthServerCtx, healthServerDone := shutdownServersGroup.Add("health", time.Second)
+	healthServerHandler, healthServerCtx, healthServerDone := goshutdown.NewGoRoutineHandler(
+		"health", goshutdown.GoRoutineSettings{})
 	go func() {
 		defer close(healthServerDone)
 		if err := healthServer.Run(healthServerCtx); err != nil {
@@ -157,18 +157,23 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	}()
 
 	// Adapt db.Close to the shutdown logic
-	dbCloseCtx, dbCloseDone := shutdownStoreGroup.Add("close", time.Second)
+	dbCloseHandler, dbCloseCtx, dbCloseDone := goshutdown.NewGoRoutineHandler(
+		"close", goshutdown.GoRoutineSettings{})
 	go func() {
 		<-dbCloseCtx.Done()
 		db.Close()
 		close(dbCloseDone)
 	}()
 
-	shutdownOrder := shutdown.NewOrder()
-	shutdownOrder.Append(shutdownServersGroup, shutdownStoreGroup)
+	groupServers := goshutdown.NewGroupHandler("servers", goshutdown.GroupSettings{})
+	groupServers.Add(metricsServerHandler, healthServerHandler, serverHandler)
+	groupDatabases := goshutdown.NewGroupHandler("databases", goshutdown.GroupSettings{})
+	groupDatabases.Add(dbCloseHandler)
+	shutdownOrder := goshutdown.NewOrder("", goshutdown.OrderSettings{})
+	shutdownOrder.Append(groupServers, groupDatabases)
 
 	<-ctx.Done()
-	return shutdownOrder.Shutdown(time.Second, logger)
+	return shutdownOrder.Shutdown(context.Background())
 }
 
 var errDatabaseTypeUnknown = errors.New("database type is unknown")
