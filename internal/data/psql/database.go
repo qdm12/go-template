@@ -48,8 +48,5 @@ func NewDatabase(config config.Postgres, logger logging.Logger) (*Database, erro
 
 // Close closes the database and prevents new queries from starting.
 func (db *Database) Close() error {
-	if err := db.sql.Close(); err != nil {
-		return err
-	}
-	return nil
+	return db.sql.Close()
 }

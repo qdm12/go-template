@@ -63,7 +63,7 @@ func extractUserID(r *http.Request) (id uint64, err error) {
 	if s == "" {
 		return 0, errUserIDMissingURLPath
 	}
-	id, err = strconv.ParseUint(s, 10, 64)
+	id, err = strconv.ParseUint(s, 10, 64) //nolint:gomnd
 	if err != nil {
 		return 0, fmt.Errorf("%w: %q", errUserIDMalformed, s)
 	}

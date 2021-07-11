@@ -9,10 +9,7 @@ type JSONStore struct {
 }
 
 func (j *JSONStore) get(env params.Env) (err error) {
-	if err := j.getFilepath(env); err != nil {
-		return err
-	}
-	return nil
+	return j.getFilepath(env)
 }
 
 func (j *JSONStore) getFilepath(env params.Env) (err error) {
