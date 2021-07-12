@@ -2,9 +2,6 @@
 
 ## Main
 
-- [ ] Use `qdm12/goshutdown`
-- [ ] Use `breml/rootcerts`
-
 ## End to end
 
 - [ ] Add authentication using credentials + (persisted) token

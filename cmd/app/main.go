@@ -10,6 +10,7 @@ import (
 	"time"
 	_ "time/tzdata"
 
+	_ "github.com/breml/rootcerts"
 	_ "github.com/lib/pq"
 	"github.com/qdm12/go-template/internal/config"
 	"github.com/qdm12/go-template/internal/data"

@@ -53,12 +53,8 @@ RUN GOARCH="$(xcputranslate translate -targetplatform=${TARGETPLATFORM} -field a
     -X 'main.commit=$COMMIT' \
     " -o app cmd/app/main.go
 
-FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS alpine
-RUN apk --update add ca-certificates
-
 FROM scratch
 USER 1000
-COPY --from=alpine --chown=1000 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT ["/app"]
 EXPOSE 8000/tcp
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=2 CMD ["/app","healthcheck"]
