@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
+	"time"
 	_ "time/tzdata"
 
 	_ "github.com/breml/rootcerts"
@@ -18,9 +20,9 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
-	"github.com/qdm12/go-template/internal/splash"
 	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/goshutdown"
+	"github.com/qdm12/gosplash"
 )
 
 var (
@@ -89,7 +91,24 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return client.Query(ctx, config.Address)
 	}
 
-	fmt.Println(splash.Splash(buildInfo))
+	announcementExpiration, err := time.Parse("2006-01-02", "2021-07-14")
+	if err != nil {
+		return err
+	}
+	splashLines := gosplash.MakeLines(gosplash.Settings{
+		User:          "qdm12",
+		Repository:    "go-template",
+		Authors:       []string{"github.com/qdm12"},
+		Emails:        []string{"quentin.mcgaw@gmail.com"},
+		Version:       buildInfo.Version,
+		Commit:        buildInfo.Commit,
+		BuildDate:     buildInfo.BuildDate,
+		Announcement:  "",
+		AnnounceExp:   announcementExpiration,
+		PaypalUser:    "qmcgaw",
+		GithubSponsor: "qdm12",
+	})
+	fmt.Println(strings.Join(splashLines, "\n"))
 
 	config, warnings, err := configReader.ReadConfig()
 	for _, warning := range warnings {
