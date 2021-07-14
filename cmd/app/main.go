@@ -81,12 +81,12 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		// long running instance of the program about its status
 		client := health.NewClient()
 
-		config, _, err := configReader.ReadConfig()
+		config, err := configReader.ReadHealth()
 		if err != nil {
 			return err
 		}
 
-		return client.Query(ctx, config.Health.Address)
+		return client.Query(ctx, config.Address)
 	}
 
 	fmt.Println(splash.Splash(buildInfo))
