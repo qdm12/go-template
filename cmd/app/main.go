@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 	_ "time/tzdata"
 
 	_ "github.com/breml/rootcerts"
@@ -25,26 +24,27 @@ import (
 )
 
 var (
+	// Values set by the build system.
 	version   = "unknown"
 	commit    = "unknown"
 	buildDate = "an unknown date"
 )
 
 func main() {
+	ctx := context.Background()
+	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+
 	buildInfo := models.BuildInformation{
 		Version:   version,
 		Commit:    commit,
 		BuildDate: buildDate,
 	}
 
-	ctx := context.Background()
-	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-
-	configReader := config.NewReader()
+	args := os.Args
 
 	logger := logging.NewParent(logging.Settings{})
 
-	args := os.Args
+	configReader := config.NewReader()
 
 	errorCh := make(chan error)
 	go func() {
@@ -57,7 +57,7 @@ func main() {
 		stop()
 	case err := <-errorCh:
 		close(errorCh)
-		if err == nil { // expected exit such as healthcheck
+		if err == nil { // expected exit such as healthcheck query
 			os.Exit(0)
 		}
 		logger.Error("Fatal error: " + err.Error())
