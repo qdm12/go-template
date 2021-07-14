@@ -60,7 +60,8 @@ func main() {
 		if err == nil { // expected exit such as healthcheck
 			os.Exit(0)
 		}
-		logger.Error(err)
+		logger.Error("Fatal error: " + err.Error())
+		os.Exit(1)
 	}
 
 	err := <-errorCh
