@@ -63,18 +63,10 @@ func main() {
 		logger.Error(err)
 	}
 
-	const shutdownGracePeriod = 5 * time.Second
-	timer := time.NewTimer(shutdownGracePeriod)
-	select {
-	case <-errorCh:
-		if !timer.Stop() {
-			<-timer.C
-		}
-		logger.Info("Shutdown successful")
-	case <-timer.C:
-		logger.Warn("Shutdown timed out")
+	err := <-errorCh
+	if err != nil {
+		logger.Error("shutdown error: " + err.Error())
 	}
-
 	os.Exit(1)
 }
 
