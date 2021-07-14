@@ -2,18 +2,32 @@
 
 *SHORT_DESCRIPTION*
 
-<img height="200" src="https://raw.githubusercontent.com/qdm12/go-template/main/title.svg?sanitize=true">
+![Title](https://raw.githubusercontent.com/qdm12/go-template/main/title.svg)
 
 [![Build status](https://github.com/qdm12/go-template/workflows/CI/badge.svg)](https://github.com/qdm12/go-template/actions?query=workflow%3ACI)
-[![Docker Pulls](https://img.shields.io/docker/pulls/qmcgaw/go-template-docker.svg)](https://hub.docker.com/r/qmcgaw/go-template-docker)
-[![Docker Stars](https://img.shields.io/docker/stars/qmcgaw/go-template-docker.svg)](https://hub.docker.com/r/qmcgaw/go-template-docker)
-[![Image size](https://images.microbadger.com/badges/image/qmcgaw/go-template-docker.svg)](https://microbadger.com/images/qmcgaw/go-template-docker)
-[![Image version](https://images.microbadger.com/badges/version/qmcgaw/go-template-docker.svg)](https://microbadger.com/images/qmcgaw/go-template-docker)
 
-[![Join Slack channel](https://img.shields.io/badge/slack-@qdm12-yellow.svg?logo=slack)](https://join.slack.com/t/qdm12/shared_invite/enQtOTE0NjcxNTM1ODc5LTYyZmVlOTM3MGI4ZWU0YmJkMjUxNmQ4ODQ2OTAwYzMxMTlhY2Q1MWQyOWUyNjc2ODliNjFjMDUxNWNmNzk5MDk)
+[![dockeri.co](https://dockeri.co/image/qmcgaw/go-template-docker)](https://hub.docker.com/r/qmcgaw/go-template-docker)
+
+![Last release](https://img.shields.io/github/release/qdm12/go-template?label=Last%20release)
+![Last Docker tag](https://img.shields.io/docker/v/qmcgaw/go-template-docker?sort=semver&label=Last%20Docker%20tag)
+[![Last release size](https://img.shields.io/docker/image-size/qmcgaw/go-template-docker?sort=semver&label=Last%20released%20image)](https://hub.docker.com/r/qmcgaw/go-template-docker/tags?page=1&ordering=last_updated)
+![GitHub last release date](https://img.shields.io/github/release-date/qdm12/go-template?label=Last%20release%20date)
+![Commits since release](https://img.shields.io/github/commits-since/qdm12/go-template/latest?sort=semver)
+
+[![Latest size](https://img.shields.io/docker/image-size/qmcgaw/go-template-docker/latest?label=Latest%20image)](https://hub.docker.com/r/qmcgaw/go-template-docker/tags)
+
 [![GitHub last commit](https://img.shields.io/github/last-commit/qdm12/go-template.svg)](https://github.com/qdm12/go-template/commits/main)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/qdm12/go-template.svg)](https://github.com/qdm12/go-template/graphs/contributors)
+[![GitHub closed PRs](https://img.shields.io/github/issues-pr-closed/qdm12/go-template.svg)](https://github.com/qdm12/go-template/pulls?q=is%3Apr+is%3Aclosed)
 [![GitHub issues](https://img.shields.io/github/issues/qdm12/go-template.svg)](https://github.com/qdm12/go-template/issues)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed/qdm12/go-template.svg)](https://github.com/qdm12/go-template/issues?q=is%3Aissue+is%3Aclosed)
+
+[![Lines of code](https://img.shields.io/tokei/lines/github/qdm12/go-template)](https://github.com/qdm12/go-template)
+![Code size](https://img.shields.io/github/languages/code-size/qdm12/go-template)
+![GitHub repo size](https://img.shields.io/github/repo-size/qdm12/go-template)
+![Go version](https://img.shields.io/github/go-mod/go-version/qdm12/go-template)
+
+![Visitors count](https://visitor-badge.laobi.icu/badge?page_id=go-template.readme)
 
 ## Features
 
