@@ -94,8 +94,3 @@ jobs:
             VERSION=${{ steps.vars.outputs.version }}
           tags: qmcgaw/go-template-docker:${{ steps.vars.outputs.version }}
           push: true
-
-      - if: github.event.ref == 'refs/heads/main'
-        name: Microbadger hook
-        run: curl -X POST https://hooks.microbadger.com/images/qmcgaw/go-template-docker/WEBHOOK_LINK
-        continue-on-error: true
