@@ -4,7 +4,7 @@
 
 ![Title](https://raw.githubusercontent.com/qdm12/go-template/main/title.svg)
 
-[![Build status](https://github.com/qdm12/go-template/workflows/CI/badge.svg)](https://github.com/qdm12/go-template/actions?query=workflow%3ACI)
+[![Build status](https://github.com/qdm12/go-template/actions/workflows/ci.yml/badge.svg)](https://github.com/qdm12/go-template/actions/workflows/ci.yml)
 
 [![dockeri.co](https://dockeri.co/image/qmcgaw/go-template-docker)](https://hub.docker.com/r/qmcgaw/go-template-docker)
 
