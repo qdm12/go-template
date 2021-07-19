@@ -43,13 +43,13 @@ RUN git init && \
 FROM base AS build
 ARG TARGETPLATFORM
 ARG VERSION=unknown
-ARG BUILD_DATE="an unknown date"
+ARG CREATED="an unknown date"
 ARG COMMIT=unknown
 RUN GOARCH="$(xcputranslate translate -targetplatform=${TARGETPLATFORM} -field arch)" \
     GOARM="$(xcputranslate translate -targetplatform=${TARGETPLATFORM} -field arm)" \
     go build -trimpath -ldflags="-s -w \
     -X 'main.version=$VERSION' \
-    -X 'main.buildDate=$BUILD_DATE' \
+    -X 'main.buildDate=$CREATED' \
     -X 'main.commit=$COMMIT' \
     " -o app cmd/app/main.go
 
@@ -75,12 +75,12 @@ ENV HTTP_SERVER_ADDRESS=:8000 \
     TZ=America/Montreal
 COPY --chown=1000 postgres/schema.sql /schema.sql
 ARG VERSION=unknown
-ARG BUILD_DATE="an unknown date"
+ARG CREATED="an unknown date"
 ARG COMMIT=unknown
 LABEL \
     org.opencontainers.image.authors="quentin.mcgaw@gmail.com" \
     org.opencontainers.image.version=$VERSION \
-    org.opencontainers.image.created=$BUILD_DATE \
+    org.opencontainers.image.created=$CREATED \
     org.opencontainers.image.revision=$COMMIT \
     org.opencontainers.image.url="https://github.com/qdm12/go-template" \
     org.opencontainers.image.documentation="https://github.com/qdm12/go-template/blob/main/README.md" \
