@@ -30,6 +30,7 @@
         // "alefragnani.Bookmarks", // Manage bookmarks
         // "quicktype.quicktype", // Paste JSON as code
         // "spikespaz.vscode-smoothtype", // smooth cursor animation
+        "github.copilot"
     ],
     "settings": {
         "files.eol": "\n",
