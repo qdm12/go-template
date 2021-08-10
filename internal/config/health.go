@@ -4,8 +4,18 @@ import (
 	"github.com/qdm12/golibs/params"
 )
 
+var _ Reader = (*Health)(nil)
+
 type Health struct {
 	Address string
+}
+
+func (h *Health) Read(env params.Env) (warnings []string, err error) {
+	warning, err := h.get(env)
+	if warning != "" {
+		warnings = append(warnings, warning)
+	}
+	return warnings, err
 }
 
 func (h *Health) get(env params.Env) (warning string, err error) {

@@ -21,6 +21,7 @@ import (
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
 	"github.com/qdm12/golibs/logging"
+	"github.com/qdm12/golibs/params"
 	"github.com/qdm12/goshutdown"
 	"github.com/qdm12/gosplash"
 )
@@ -46,11 +47,11 @@ func main() {
 
 	logger := logging.NewParent(logging.Settings{})
 
-	configReader := config.NewReader()
+	env := params.NewEnv()
 
 	errorCh := make(chan error)
 	go func() {
-		errorCh <- _main(ctx, buildInfo, args, logger, configReader)
+		errorCh <- _main(ctx, buildInfo, args, logger, env)
 	}()
 
 	select {
@@ -74,7 +75,7 @@ func main() {
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger logging.ParentLogger, configReader config.ReaderInterface) error {
+	args []string, logger logging.ParentLogger, env params.Env) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {
@@ -83,7 +84,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		// long running instance of the program about its status
 		client := health.NewClient()
 
-		config, err := configReader.ReadHealth()
+		var config config.Health
+		_, err := config.Read(env)
 		if err != nil {
 			return err
 		}
@@ -110,7 +112,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	})
 	fmt.Println(strings.Join(splashLines, "\n"))
 
-	config, warnings, err := configReader.ReadConfig()
+	var config config.Config
+	warnings, err := config.Read(env)
 	for _, warning := range warnings {
 		logger.Warn(warning)
 	}

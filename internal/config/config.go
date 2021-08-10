@@ -9,6 +9,12 @@ import (
 	"github.com/qdm12/golibs/params"
 )
 
+var _ Reader = (*Config)(nil)
+
+type Reader interface {
+	Read(env params.Env) (warnings []string, err error)
+}
+
 type Config struct {
 	HTTP    HTTP
 	Metrics Metrics
@@ -24,7 +30,7 @@ var (
 	ErrStoreConfig  = errors.New("cannot obtain store config")
 )
 
-func (c *Config) get(env params.Env) (warnings []string, err error) {
+func (c *Config) Read(env params.Env) (warnings []string, err error) {
 	warning, err := c.HTTP.get(env)
 	if len(warning) > 0 {
 		warnings = append(warnings, warning)
