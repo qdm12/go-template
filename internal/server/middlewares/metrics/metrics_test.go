@@ -44,7 +44,7 @@ func Test_metricsMiddleware(t *testing.T) {
 		return time.Unix(unix, 0)
 	}
 
-	metrics := mock_metrics.NewMockMetrics(ctrl)
+	metrics := mock_metrics.NewMockInterface(ctrl)
 	metrics.EXPECT().InflightRequestsGaugeAdd(1)
 	metrics.EXPECT().InflightRequestsGaugeAdd(-1)
 	metrics.EXPECT().RequestCountInc(routePattern, responseStatus)

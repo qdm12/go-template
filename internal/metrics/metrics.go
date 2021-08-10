@@ -9,24 +9,25 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Metrics
+//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Interface
 
-// Metrics contains methods to update various metrics.
-type Metrics interface {
+var _ Interface = (*Metrics)(nil)
+
+type Interface interface {
 	RequestCountInc(routePattern string, statusCode int)
 	ResponseBytesCountAdd(routePattern string, statusCode int, bytesWritten int)
 	InflightRequestsGaugeAdd(addition int)
 	ResponseTimeHistogramObserve(routePattern string, statusCode int, duration time.Duration)
 }
 
-type metrics struct {
+type Metrics struct {
 	requestsCounter       *prometheus.CounterVec
 	responseBytesCounter  *prometheus.CounterVec
 	inFlighRequestsGauge  prometheus.Gauge
 	responseTimeHistogram *prometheus.HistogramVec
 }
 
-func New(register bool) (m Metrics, err error) {
+func New(register bool) (m *Metrics, err error) {
 	requestsCounter, err := newCounterVec(
 		"requests",
 		"Counter for the number of requests by handler and HTTP status",
@@ -53,7 +54,7 @@ func New(register bool) (m Metrics, err error) {
 		return nil, err
 	}
 
-	return &metrics{
+	return &Metrics{
 		requestsCounter:       requestsCounter,
 		responseBytesCounter:  responseBytesCounter,
 		inFlighRequestsGauge:  inFlighRequestsGauge,
@@ -61,18 +62,18 @@ func New(register bool) (m Metrics, err error) {
 	}, nil
 }
 
-func (m *metrics) RequestCountInc(routePattern string, statusCode int) {
+func (m *Metrics) RequestCountInc(routePattern string, statusCode int) {
 	m.requestsCounter.WithLabelValues(routePattern, http.StatusText(statusCode)).Inc()
 }
 
-func (m *metrics) ResponseBytesCountAdd(routePattern string, statusCode int, bytesWritten int) {
+func (m *Metrics) ResponseBytesCountAdd(routePattern string, statusCode int, bytesWritten int) {
 	m.responseBytesCounter.WithLabelValues(routePattern, http.StatusText(statusCode)).Add(float64(bytesWritten))
 }
 
-func (m *metrics) InflightRequestsGaugeAdd(addition int) {
+func (m *Metrics) InflightRequestsGaugeAdd(addition int) {
 	m.inFlighRequestsGauge.Add(float64(addition))
 }
 
-func (m *metrics) ResponseTimeHistogramObserve(routePattern string, statusCode int, duration time.Duration) {
+func (m *Metrics) ResponseTimeHistogramObserve(routePattern string, statusCode int, duration time.Duration) {
 	m.responseTimeHistogram.WithLabelValues(routePattern, http.StatusText(statusCode)).Observe(duration.Seconds())
 }

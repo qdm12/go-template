@@ -11,7 +11,6 @@ import (
 	"github.com/qdm12/go-template/internal/processor/mock_processor"
 	"github.com/qdm12/golibs/logging/mock_logging"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func Test_New(t *testing.T) {
@@ -22,16 +21,14 @@ func Test_New(t *testing.T) {
 		Address: "test",
 	}
 	logger := mock_logging.NewMockLogger(ctrl)
-	metrics := mock_metrics.NewMockMetrics(ctrl)
+	metrics := mock_metrics.NewMockInterface(ctrl)
 	buildInformation := models.BuildInformation{}
-	proc := mock_processor.NewMockProcessor(ctrl)
+	proc := mock_processor.NewMockInterface(ctrl)
 
-	serverInterface := New(config, proc, logger, metrics, buildInformation)
-	serverImpl, ok := serverInterface.(*server)
-	require.True(t, ok)
-	assert.Equal(t, config.Address, serverImpl.address)
-	assert.Equal(t, logger, serverImpl.logger)
-	assert.NotNil(t, serverImpl.handler)
+	server := New(config, proc, logger, metrics, buildInformation)
+	assert.Equal(t, config.Address, server.address)
+	assert.Equal(t, logger, server.logger)
+	assert.NotNil(t, server.handler)
 }
 
 func Test_server_Run(t *testing.T) {
@@ -44,7 +41,7 @@ func Test_server_Run(t *testing.T) {
 	logger := mock_logging.NewMockLogger(ctrl)
 	logger.EXPECT().Info("listening on " + address)
 
-	server := &server{
+	server := &Server{
 		address: address,
 		handler: nil,
 		logger:  logger,

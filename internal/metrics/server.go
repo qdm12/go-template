@@ -11,18 +11,20 @@ import (
 	"github.com/qdm12/golibs/logging"
 )
 
-type Server interface {
+var _ Runner = (*Server)(nil)
+
+type Runner interface {
 	Run(ctx context.Context) error
 }
 
-type server struct {
+type Server struct {
 	address string
 	logger  logging.Logger
 	handler http.Handler
 }
 
-func NewServer(address string, logger logging.Logger) Server {
-	return &server{
+func NewServer(address string, logger logging.Logger) *Server {
+	return &Server{
 		address: address,
 		logger:  logger,
 		handler: promhttp.Handler(),
@@ -34,7 +36,7 @@ var (
 	ErrShutdown = errors.New("server could not be shutdown")
 )
 
-func (s *server) Run(ctx context.Context) error {
+func (s *Server) Run(ctx context.Context) error {
 	server := http.Server{Addr: s.address, Handler: s.handler}
 	shutdownErrCh := make(chan error)
 	go func() {
