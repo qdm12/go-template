@@ -12,7 +12,7 @@ type HTTP struct {
 	AllowedHeaders []string
 }
 
-func (h *HTTP) get(env params.Env) (warning string, err error) {
+func (h *HTTP) get(env params.Interface) (warning string, err error) {
 	h.Address, warning, err = h.getAddress(env)
 	if err != nil {
 		return warning, err
@@ -36,7 +36,7 @@ func (h *HTTP) get(env params.Env) (warning string, err error) {
 	return warning, nil
 }
 
-func (h *HTTP) getAddress(env params.Env) (address, warning string, err error) {
+func (h *HTTP) getAddress(env params.Interface) (address, warning string, err error) {
 	const envKey = "HTTP_SERVER_ADDRESS"
 	options := []params.OptionSetter{
 		params.Default(":8000"),
@@ -44,20 +44,20 @@ func (h *HTTP) getAddress(env params.Env) (address, warning string, err error) {
 	return env.ListeningAddress(envKey, options...)
 }
 
-func (h *HTTP) getRootURL(env params.Env) (rootURL string, err error) {
+func (h *HTTP) getRootURL(env params.Interface) (rootURL string, err error) {
 	return env.RootURL("HTTP_SERVER_ROOT_URL")
 }
 
-func (h *HTTP) getLogRequests(env params.Env) (log bool, err error) {
+func (h *HTTP) getLogRequests(env params.Interface) (log bool, err error) {
 	return env.OnOff("HTTP_SERVER_LOG_REQUESTS", params.Default("on"))
 }
 
-func (h *HTTP) getAllowedOrigins(env params.Env) (
+func (h *HTTP) getAllowedOrigins(env params.Interface) (
 	allowedOrigins []string, err error) {
 	return env.CSV("HTTP_SERVER_ALLOWED_ORIGINS")
 }
 
-func (h *HTTP) getAllowedHeaders(env params.Env) (
+func (h *HTTP) getAllowedHeaders(env params.Interface) (
 	allowedOrigins []string, err error) {
 	return env.CSV("HTTP_SERVER_ALLOWED_HEADERS")
 }

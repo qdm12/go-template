@@ -12,7 +12,7 @@ import (
 var _ Reader = (*Config)(nil)
 
 type Reader interface {
-	Read(env params.Env) (warnings []string, err error)
+	Read(env params.Interface) (warnings []string, err error)
 }
 
 type Config struct {
@@ -30,7 +30,7 @@ var (
 	ErrStoreConfig  = errors.New("cannot obtain store config")
 )
 
-func (c *Config) Read(env params.Env) (warnings []string, err error) {
+func (c *Config) Read(env params.Interface) (warnings []string, err error) {
 	warning, err := c.HTTP.get(env)
 	if len(warning) > 0 {
 		warnings = append(warnings, warning)

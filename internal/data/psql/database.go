@@ -16,7 +16,7 @@ import (
 type Database struct {
 	sql    *sql.DB
 	logger logging.Logger
-	random random.Random
+	random random.Randomer
 }
 
 // NewDatabase creates a database connection pool in DB and pings the database.

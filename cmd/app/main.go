@@ -45,9 +45,9 @@ func main() {
 
 	args := os.Args
 
-	logger := logging.NewParent(logging.Settings{})
+	logger := logging.New(logging.Settings{})
 
-	env := params.NewEnv()
+	env := params.New()
 
 	errorCh := make(chan error)
 	go func() {
@@ -75,7 +75,7 @@ func main() {
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger logging.ParentLogger, env params.Env) error {
+	args []string, logger logging.ParentLogger, env params.Interface) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {

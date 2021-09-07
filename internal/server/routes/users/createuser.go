@@ -31,7 +31,7 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, context.DeadlineExceeded) {
 			errResponder.Respond(w, http.StatusRequestTimeout, "")
 		} else {
-			h.logger.Error(err)
+			h.logger.Error(err.Error())
 			errResponder.Respond(w, http.StatusInternalServerError, "")
 		}
 		return

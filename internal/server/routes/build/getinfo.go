@@ -21,7 +21,7 @@ func (h *handler) getBuild(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(h.build)
 	if err != nil {
-		h.logger.Error(err)
+		h.logger.Error(err.Error())
 		errResponder.Respond(w, http.StatusInternalServerError, "")
 		return
 	}

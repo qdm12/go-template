@@ -28,7 +28,7 @@ var (
 	ErrPostgresConfig    = errors.New("Postgres config")
 )
 
-func (s *Store) get(env params.Env) (warning string, err error) {
+func (s *Store) get(env params.Interface) (warning string, err error) {
 	s.Type, err = s.getType(env)
 	if err != nil {
 		return "", err
@@ -55,7 +55,7 @@ func (s *Store) get(env params.Env) (warning string, err error) {
 	return warning, err
 }
 
-func (s *Store) getType(env params.Env) (t StoreType, err error) {
+func (s *Store) getType(env params.Interface) (t StoreType, err error) {
 	const envKey = "STORE_TYPE"
 	possibilities := []string{"memory", "json", "postgres"}
 	value, err := env.Inside(envKey, possibilities, params.Default("memory"))

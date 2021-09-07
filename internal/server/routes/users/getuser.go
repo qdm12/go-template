@@ -39,7 +39,7 @@ func (h *handler) getUserByID(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, context.DeadlineExceeded):
 			errResponder.Respond(w, http.StatusRequestTimeout, "")
 		default:
-			h.logger.Error(err)
+			h.logger.Error(err.Error())
 			errResponder.Respond(w, http.StatusInternalServerError, "")
 		}
 		return
@@ -47,7 +47,7 @@ func (h *handler) getUserByID(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
-		h.logger.Error(err)
+		h.logger.Error(err.Error())
 		errResponder.Respond(w, http.StatusInternalServerError, "")
 		return
 	}

@@ -11,7 +11,7 @@ type Postgres struct {
 	Database string
 }
 
-func (p *Postgres) get(env params.Env) (warning string, err error) {
+func (p *Postgres) get(env params.Interface) (warning string, err error) {
 	p.User, err = p.getUser(env)
 	if err != nil {
 		return "", err
@@ -35,7 +35,7 @@ func (p *Postgres) get(env params.Env) (warning string, err error) {
 	return warning, nil
 }
 
-func (p *Postgres) getAddress(env params.Env) (address, warning string, err error) {
+func (p *Postgres) getAddress(env params.Interface) (address, warning string, err error) {
 	const envKey = "STORE_POSTGRES_ADDRESS"
 	options := []params.OptionSetter{
 		params.Default("psql:5432"),
@@ -43,7 +43,7 @@ func (p *Postgres) getAddress(env params.Env) (address, warning string, err erro
 	return env.ListeningAddress(envKey, options...)
 }
 
-func (p *Postgres) getUser(env params.Env) (user string, err error) {
+func (p *Postgres) getUser(env params.Interface) (user string, err error) {
 	const envKey = "STORE_POSTGRES_USER"
 	options := []params.OptionSetter{
 		params.Default("postgres"),
@@ -53,7 +53,7 @@ func (p *Postgres) getUser(env params.Env) (user string, err error) {
 	return env.Get(envKey, options...)
 }
 
-func (p *Postgres) getPassword(env params.Env) (password string, err error) {
+func (p *Postgres) getPassword(env params.Interface) (password string, err error) {
 	const envKey = "STORE_POSTGRES_PASSWORD"
 	options := []params.OptionSetter{
 		params.Default("postgres"),
@@ -63,7 +63,7 @@ func (p *Postgres) getPassword(env params.Env) (password string, err error) {
 	return env.Get(envKey, options...)
 }
 
-func (p *Postgres) getDatabase(env params.Env) (database string, err error) {
+func (p *Postgres) getDatabase(env params.Interface) (database string, err error) {
 	const envKey = "STORE_POSTGRES_DATABASE"
 	options := []params.OptionSetter{
 		params.Default("database"),
