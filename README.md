@@ -1,6 +1,6 @@
 # go-template
 
-*SHORT_DESCRIPTION*
+SHORT_DESCRIPTION
 
 ![Title](https://raw.githubusercontent.com/qdm12/go-template/main/title.svg)
 
@@ -73,41 +73,31 @@
 
 ## Development
 
-1. Setup your environment
+You can setup your development environment with a [Docker development container](.devcontainer) or locally:
 
-    <details><summary>Using VSCode and Docker (easier)</summary><p>
-
-    Please refer to the corresponding [readme](.devcontainer).
-
-    </p></details>
-
-    <details><summary>Locally</summary><p>
-
-    1. Install [Go](https://golang.org/dl/), [Docker](https://www.docker.com/products/docker-desktop) and [Git](https://git-scm.com/downloads)
-    1. Install Go dependencies with
-
-        ```sh
-        go mod download
-        ```
-
-    1. Install [golangci-lint](https://github.com/golangci/golangci-lint#install)
-    1. You might want to use an editor such as [Visual Studio Code](https://code.visualstudio.com/download) with the [Go extension](https://code.visualstudio.com/docs/languages/go).
-
-    </p></details>
-
-1. Commands available:
+1. Install [Go](https://golang.org/dl/), [Docker](https://www.docker.com/products/docker-desktop) and [Git](https://git-scm.com/downloads)
+1. Install Go dependencies with
 
     ```sh
-    # Build the binary
-    go build cmd/app/main.go
-    # Test the code
-    go test ./...
-    # Lint the code
-    golangci-lint run
-    # Build the Docker image
-    docker build -t qmcgaw/go-template-docker .
+    go mod download
     ```
 
-1. See [Contributing](https://github.com/qdm12/go-template/main/.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
+1. Install [golangci-lint](https://github.com/golangci/golangci-lint#install)
+1. You might want to use an editor such as [Visual Studio Code](https://code.visualstudio.com/download) with the [Go extension](https://code.visualstudio.com/docs/languages/go).
+
+Commands available are:
+
+```sh
+# Build the binary
+go build cmd/app/main.go
+# Test the code
+go test ./...
+# Lint the code
+golangci-lint run
+# Build the Docker image
+docker build -t qmcgaw/go-template-docker .
+```
+
+See [Contributing](https://github.com/qdm12/go-template/main/.github/CONTRIBUTING.md) for more information on how to contribute to this repository.
 
 ## TODOs
