@@ -1,24 +1,9 @@
-// Package contenttype contains functions to extract content type
-// information from request headers as well as set correct headers
-// on the response depending on the Accept and Content-Type request
-// headers.
 package contenttype
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
-)
-
-const (
-	JSON = "application/json"
-	HTML = "text/html"
-)
-
-var (
-	errContentTypeNotSupported     = errors.New("content type is not supported")
-	errRespContentTypeNotSupported = errors.New("no response content type supported")
 )
 
 func APICheck(header http.Header) (
@@ -37,14 +22,14 @@ func APICheck(header http.Header) (
 		case HTML:
 			responseContentType = JSON // override for browser access to the API
 		}
-		if len(responseContentType) > 0 {
+		if responseContentType != "" {
 			break
 		}
 	}
 
-	if len(responseContentType) == 0 {
+	if responseContentType == "" {
 		responseContentType = JSON
-		return "", responseContentType, fmt.Errorf("%w: %s", errRespContentTypeNotSupported, accept)
+		return "", responseContentType, fmt.Errorf("%w: %s", ErrRespContentTypeNotSupported, accept)
 	}
 
 	requestContentType = header.Get("Content-Type")
@@ -53,7 +38,7 @@ func APICheck(header http.Header) (
 		requestContentType = JSON
 	}
 	if requestContentType != JSON {
-		return "", responseContentType, fmt.Errorf("%w: %q", errContentTypeNotSupported, requestContentType)
+		return "", responseContentType, fmt.Errorf("%w: %q", ErrContentTypeNotSupported, requestContentType)
 	}
 
 	return requestContentType, responseContentType, nil
