@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
+	"github.com/qdm12/go-template/internal/server/contenttype"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

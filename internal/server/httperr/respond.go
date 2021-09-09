@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
+	"github.com/qdm12/go-template/internal/server/contenttype"
 )
 
 type errJSONWrapper struct {

@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-chi/chi"
 	dataerr "github.com/qdm12/go-template/internal/data/errors"
-	contenttype "github.com/qdm12/go-template/internal/server/contenttypes"
+	"github.com/qdm12/go-template/internal/server/contenttype"
 	"github.com/qdm12/go-template/internal/server/httperr"
 )
 
