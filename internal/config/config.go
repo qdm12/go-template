@@ -24,10 +24,11 @@ type Config struct {
 }
 
 var (
-	ErrLogConfig    = errors.New("cannot obtain log config")
-	ErrHTTPConfig   = errors.New("cannot obtain HTTP server config")
-	ErrHealthConfig = errors.New("cannot obtain health config")
-	ErrStoreConfig  = errors.New("cannot obtain store config")
+	ErrHTTPConfig    = errors.New("cannot obtain HTTP server config")
+	ErrStoreConfig   = errors.New("cannot obtain store config")
+	ErrHealthConfig  = errors.New("cannot obtain health config")
+	ErrMetricsConfig = errors.New("cannot obtain metrics config")
+	ErrLogConfig     = errors.New("cannot obtain log config")
 )
 
 func (c *Config) Read(env params.Interface) (warnings []string, err error) {
@@ -37,19 +38,6 @@ func (c *Config) Read(env params.Interface) (warnings []string, err error) {
 	}
 	if err != nil {
 		return warnings, fmt.Errorf("%w: %s", ErrHTTPConfig, err)
-	}
-
-	warning, err = c.Metrics.get(env)
-	if len(warning) > 0 {
-		warnings = append(warnings, warning)
-	}
-	if err != nil {
-		return warnings, fmt.Errorf("%w: %s", ErrHTTPConfig, err)
-	}
-
-	err = c.Log.get(env)
-	if err != nil {
-		return warnings, fmt.Errorf("%w: %s", ErrLogConfig, err)
 	}
 
 	warning, err = c.Store.get(env)
@@ -66,6 +54,19 @@ func (c *Config) Read(env params.Interface) (warnings []string, err error) {
 	}
 	if err != nil {
 		return warnings, fmt.Errorf("%w: %s", ErrHealthConfig, err)
+	}
+
+	warning, err = c.Metrics.get(env)
+	if len(warning) > 0 {
+		warnings = append(warnings, warning)
+	}
+	if err != nil {
+		return warnings, fmt.Errorf("%w: %s", ErrMetricsConfig, err)
+	}
+
+	err = c.Log.get(env)
+	if err != nil {
+		return warnings, fmt.Errorf("%w: %s", ErrLogConfig, err)
 	}
 
 	return warnings, nil
