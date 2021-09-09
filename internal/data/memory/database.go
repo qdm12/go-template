@@ -7,7 +7,7 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 )
 
-// Database is the JSON file implementation of the database store.
+// Database is the in memory implementation of the database store.
 type Database struct {
 	sync.RWMutex
 	data models.Data
