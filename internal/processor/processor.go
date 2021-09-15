@@ -7,15 +7,6 @@ import (
 	"github.com/qdm12/go-template/internal/data"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Interface
-
-var _ Interface = (*Processor)(nil)
-
-type Interface interface {
-	UserCreator
-	UserGetter
-}
-
 type Processor struct {
 	db data.Database
 }
