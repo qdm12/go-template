@@ -9,7 +9,7 @@ require (
 	github.com/lib/pq v1.10.3
 	github.com/prometheus/client_golang v1.11.0
 	github.com/qdm12/golibs v0.0.0-20210829185735-8ab22c3de994
-	github.com/qdm12/goshutdown v0.1.0
+	github.com/qdm12/goshutdown v0.3.0
 	github.com/qdm12/gosplash v0.1.0
 	github.com/stretchr/testify v1.7.0
 )
