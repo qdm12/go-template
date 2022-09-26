@@ -3,7 +3,7 @@ module github.com/qdm12/go-template
 go 1.17
 
 require (
-	github.com/breml/rootcerts v0.1.1
+	github.com/breml/rootcerts v0.2.7
 	github.com/go-chi/chi v1.5.4
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.3
