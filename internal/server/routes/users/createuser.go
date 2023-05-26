@@ -23,7 +23,8 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user models.User
-	ok, respondErr := decodejson.DecodeBody(w, 0, r.Body, &user, responseContentType)
+	const maxBytes = 1024 // 1KB is enough
+	ok, respondErr := decodejson.DecodeBody(w, maxBytes, r.Body, &user, responseContentType)
 	if !ok {
 		if respondErr != nil {
 			h.logger.Debugf("responding error: %s", respondErr)

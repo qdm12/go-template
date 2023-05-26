@@ -121,3 +121,61 @@ func Test_extractClientIP(t *testing.T) {
 		})
 	}
 }
+
+func Test_splitHostPort(t *testing.T) {
+	t.Parallel()
+
+	testCases := map[string]struct {
+		address    string
+		ip         string
+		port       string
+		errMessage string
+	}{
+		"empty_address": {
+			errMessage: "missing port in address",
+		},
+		"invalid_address_with_brackets": {
+			address:    "[abc]",
+			errMessage: "address [abc]: missing port in address",
+		},
+		"address_with_brackets_without_port": {
+			address:    "[::1]",
+			errMessage: "address [::1]: missing port in address",
+		},
+		"address_with_brackets": {
+			address: "[::1]:8000",
+			ip:      "::1",
+			port:    "8000",
+		},
+		"malformed_ipv6_address_port": {
+			address:    "::x:",
+			errMessage: "address ::x:: too many colons in address",
+		},
+		"ipv6_address": {
+			address: "::1:8000",
+			ip:      "::1",
+			port:    "8000",
+		},
+		"ipv4_address": {
+			address: "1.2.3.4:8000",
+			ip:      "1.2.3.4",
+			port:    "8000",
+		},
+	}
+
+	for name, testCase := range testCases {
+		testCase := testCase
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			ip, port, err := splitHostPort(testCase.address)
+			assert.Equal(t, testCase.ip, ip)
+			assert.Equal(t, testCase.port, port)
+			if testCase.errMessage != "" {
+				assert.EqualError(t, err, testCase.errMessage)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
