@@ -1,5 +1,5 @@
 package log
 
 type Logger interface {
-	Infof(format string, args ...interface{})
+	Infof(format string, args ...any)
 }

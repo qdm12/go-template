@@ -24,8 +24,8 @@ func Test_DecodeBody(t *testing.T) {
 	testCases := map[string]struct {
 		maxBytes           int64
 		requestBody        string
-		v                  interface{}
-		expectedV          interface{}
+		v                  any
+		expectedV          any
 		ok                 bool
 		responseErrWrapped error
 		responseErrMessage string

@@ -21,7 +21,7 @@ import (
 // Therefore the caller should check for `errorResponseErr`
 // every time `ok` is false.
 func DecodeBody(w http.ResponseWriter, maxBytes int64,
-	body io.ReadCloser, v interface{}, responseContentType string) (
+	body io.ReadCloser, v any, responseContentType string) (
 	ok bool, responseErr error) {
 	body = http.MaxBytesReader(w, body, maxBytes)
 

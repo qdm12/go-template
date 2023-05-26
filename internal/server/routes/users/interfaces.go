@@ -7,7 +7,7 @@ import (
 )
 
 type Logger interface {
-	Debugf(format string, args ...interface{})
+	Debugf(format string, args ...any)
 	Error(s string)
 }
 

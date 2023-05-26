@@ -10,7 +10,7 @@ type Responder struct {
 }
 
 type Logger interface {
-	Debugf(format string, args ...interface{})
+	Debugf(format string, args ...any)
 }
 
 func NewResponder(contentType string, logger Logger) *Responder {
