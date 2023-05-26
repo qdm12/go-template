@@ -5,38 +5,40 @@ package json
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
+	"os"
 	"sync"
 
 	dataerrors "github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/data/memory"
 	"github.com/qdm12/go-template/internal/models"
-	"github.com/qdm12/golibs/files"
 )
 
 // Database is the JSON file implementation of the database store.
 type Database struct {
 	sync.Mutex
-	memory      *memory.Database
-	filepath    string
-	fileManager files.FileManager
+	memory   *memory.Database
+	filepath string
 }
 
 // NewDatabase creates a JSON file at the filepath provided if needed,
 // and reads existing data in memory.
 func NewDatabase(memory *memory.Database, filepath string) (*Database, error) {
 	db := Database{
-		memory:      memory,
-		filepath:    filepath,
-		fileManager: files.NewFileManager()}
-	exists, err := db.fileManager.FileExists(filepath)
+		memory:   memory,
+		filepath: filepath,
+	}
+	exists, err := fileExists(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
 	} else if !exists {
-		if err := db.fileManager.Touch(filepath); err != nil {
+		const perms fs.FileMode = 0600
+		err = os.WriteFile(filepath, nil, perms)
+		if err != nil {
 			return nil, fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
 		}
 	}
-	rawData, err := db.fileManager.ReadFile(filepath)
+	rawData, err := os.ReadFile(filepath)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
 	} else if len(rawData) == 0 {
@@ -76,7 +78,10 @@ func (db *Database) writeFile() error {
 	if err != nil {
 		return fmt.Errorf("%w: %s", dataerrors.ErrEncoding, err)
 	}
-	if err := db.fileManager.WriteToFile(db.filepath, b); err != nil {
+
+	const perms fs.FileMode = 0600
+	err = os.WriteFile(db.filepath, b, perms)
+	if err != nil {
 		return fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
 	}
 	return nil
@@ -84,7 +89,7 @@ func (db *Database) writeFile() error {
 
 // readFile is only used when creating the database.
 func (db *Database) readFile() error {
-	b, err := db.fileManager.ReadFile(db.filepath)
+	b, err := os.ReadFile(db.filepath)
 	if err != nil {
 		return fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
 	}
