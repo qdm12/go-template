@@ -7,7 +7,7 @@ require (
 	github.com/go-chi/chi v1.5.4
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.3
-	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_golang v1.11.1
 	github.com/qdm12/goservices v0.1.0-rc1
 	github.com/qdm12/gosettings v0.3.0-rc2
 	github.com/qdm12/gosplash v0.1.0
