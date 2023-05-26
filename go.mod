@@ -8,7 +8,6 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.3
 	github.com/prometheus/client_golang v1.11.0
-	github.com/qdm12/golibs v0.0.0-20210829185735-8ab22c3de994
 	github.com/qdm12/goservices v0.1.0-rc1
 	github.com/qdm12/gosettings v0.3.0-rc2
 	github.com/qdm12/gosplash v0.1.0
@@ -27,7 +26,6 @@ require (
 	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/phayes/permbits v0.0.0-20190612203442-39d7c581d2ee // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.26.0 // indirect
