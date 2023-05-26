@@ -7,12 +7,11 @@ import (
 	"github.com/qdm12/golibs/clientip"
 )
 
-func New(logger Logger, enabled bool) func(http.Handler) http.Handler {
+func New(logger Logger) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		return &logHandler{
 			childHandler:  handler,
 			logger:        logger,
-			enabled:       enabled,
 			httpReqParser: clientip.NewParser(),
 			timeNow:       time.Now,
 		}
@@ -22,16 +21,11 @@ func New(logger Logger, enabled bool) func(http.Handler) http.Handler {
 type logHandler struct {
 	childHandler  http.Handler
 	logger        Logger
-	enabled       bool
 	httpReqParser clientip.HTTPRequestParser
 	timeNow       func() time.Time
 }
 
 func (h *logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if !h.enabled {
-		h.childHandler.ServeHTTP(w, r)
-		return
-	}
 	startTime := h.timeNow()
 	customWriter := &statefulWriter{ResponseWriter: w}
 	h.childHandler.ServeHTTP(customWriter, r)

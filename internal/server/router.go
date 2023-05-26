@@ -1,6 +1,8 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi"
 	"github.com/qdm12/go-template/internal/config/settings"
 	"github.com/qdm12/go-template/internal/models"
@@ -16,11 +18,16 @@ func NewRouter(config settings.HTTP, logger Logger,
 	proc Processor) *chi.Mux {
 	router := chi.NewRouter()
 
-	// Middlewares
-	logMiddleware := logmware.New(logger, *config.LogRequests)
+	var middlewares []func(http.Handler) http.Handler
 	metricsMiddleware := metricsmware.New(metrics)
+	middlewares = append(middlewares, metricsMiddleware)
+	if *config.LogRequests {
+		logMiddleware := logmware.New(logger)
+		middlewares = append(middlewares, logMiddleware)
+	}
 	corsMiddleware := cors.New(config.AllowedOrigins, config.AllowedHeaders)
-	router.Use(metricsMiddleware, logMiddleware, corsMiddleware)
+	middlewares = append(middlewares, corsMiddleware)
+	router.Use(middlewares...)
 
 	APIPrefix := *config.RootURL + "/api/v1"
 
