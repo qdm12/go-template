@@ -32,6 +32,6 @@ func (h *logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	customWriter := &statefulWriter{ResponseWriter: w}
 	h.childHandler.ServeHTTP(customWriter, r)
 	clientIP := h.httpReqParser.ParseHTTPRequest(r)
-	h.logger.Infof("HTTP request: %d %s %s %s %d",
+	h.logger.Infof("HTTP request: %d %s %s %s %dB",
 		customWriter.status, r.Method, r.RequestURI, clientIP, customWriter.length)
 }
