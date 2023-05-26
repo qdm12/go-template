@@ -6,7 +6,7 @@ require (
 	github.com/breml/rootcerts v0.2.11
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/golang/mock v1.6.0
-	github.com/lib/pq v1.10.3
+	github.com/lib/pq v1.10.9
 	github.com/prometheus/client_golang v1.11.1
 	github.com/qdm12/goservices v0.1.0-rc1
 	github.com/qdm12/gosettings v0.3.0-rc2
