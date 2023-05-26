@@ -24,6 +24,7 @@ import (
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
 	"github.com/qdm12/goservices"
+	"github.com/qdm12/goservices/hooks"
 	"github.com/qdm12/goservices/httpserver"
 	"github.com/qdm12/gosplash"
 	"github.com/qdm12/log"
@@ -202,9 +203,11 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return fmt.Errorf("creating health server: %w", err)
 	}
 
+	servicesLogger := logger.New(log.SetComponent("services"))
 	sequenceSettings := goservices.SequenceSettings{
 		ServicesStart: []goservices.Service{db, metricsServer, healthServer, mainServer},
 		ServicesStop:  []goservices.Service{mainServer, db, healthServer, metricsServer},
+		Hooks:         hooks.NewWithLog(servicesLogger),
 	}
 	services, err := goservices.NewSequence(sequenceSettings)
 	if err != nil {
