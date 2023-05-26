@@ -4,19 +4,19 @@ import (
 	"net/http"
 )
 
-func NewHandler(logger Logger, healthcheck func() error) http.Handler {
-	return &handler{
+func NewHandler(logger Logger, healthcheck func() error) *Handler {
+	return &Handler{
 		logger:      logger,
 		healthcheck: healthcheck,
 	}
 }
 
-type handler struct {
+type Handler struct {
 	logger      Logger
 	healthcheck func() error
 }
 
-func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet || (r.RequestURI != "" && r.RequestURI != "/") {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return

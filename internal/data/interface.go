@@ -20,11 +20,11 @@ type Database interface {
 	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
 }
 
-func NewMemory() (Database, error) {
+func NewMemory() (db *memory.Database, err error) {
 	return memory.NewDatabase()
 }
 
-func NewJSON(filepath string) (Database, error) {
+func NewJSON(filepath string) (db *json.Database, err error) {
 	memoryDatabase, err := memory.NewDatabase()
 	if err != nil {
 		return nil, err
@@ -32,6 +32,7 @@ func NewJSON(filepath string) (Database, error) {
 	return json.NewDatabase(memoryDatabase, filepath)
 }
 
-func NewPostgres(config config.Postgres, logger log.LeveledLogger) (Database, error) {
+func NewPostgres(config config.Postgres, logger log.LeveledLogger) (
+	db *psql.Database, err error) {
 	return psql.NewDatabase(config, logger)
 }
