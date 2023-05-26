@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -62,7 +62,7 @@ func Test_metricsMiddleware(t *testing.T) {
 	handler.ServeHTTP(w, req)
 
 	result := w.Result()
-	b, err := ioutil.ReadAll(result.Body)
+	b, err := io.ReadAll(result.Body)
 	require.NoError(t, err)
 	defer result.Body.Close()
 	assert.Equal(t, responseStatus, result.StatusCode)

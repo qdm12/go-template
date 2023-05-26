@@ -6,6 +6,6 @@ import (
 
 type MemoryStore struct{}
 
-func (m *MemoryStore) get(env params.Interface) (err error) {
+func (m *MemoryStore) get(params.Interface) (err error) {
 	return nil
 }

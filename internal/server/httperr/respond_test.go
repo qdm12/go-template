@@ -1,7 +1,7 @@
 package httperr
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -42,7 +42,7 @@ func Test_Respond(t *testing.T) {
 
 			response := w.Result()
 			defer response.Body.Close()
-			bytes, err := ioutil.ReadAll(response.Body)
+			bytes, err := io.ReadAll(response.Body)
 			require.NoError(t, err)
 			body := string(bytes)
 

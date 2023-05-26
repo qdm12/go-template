@@ -13,7 +13,7 @@ type Log struct {
 	Level log.Level
 }
 
-func (l *Log) get(env params.Interface) (err error) {
+func (l *Log) get(params.Interface) (err error) {
 	l.Level, err = readLogLevel()
 	if err != nil {
 		return err

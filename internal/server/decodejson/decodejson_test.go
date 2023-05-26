@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -72,7 +71,7 @@ func Test_DecodeBody(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			w := httptest.NewRecorder()
-			requestBody := ioutil.NopCloser(
+			requestBody := io.NopCloser(
 				strings.NewReader(testCase.requestBody),
 			)
 
@@ -80,7 +79,7 @@ func Test_DecodeBody(t *testing.T) {
 				w, testCase.maxBytes, requestBody, testCase.v, contenttype.JSON)
 
 			require.Equal(t, testCase.ok, ok)
-			bytes, err := ioutil.ReadAll(w.Body)
+			bytes, err := io.ReadAll(w.Body)
 			require.NoError(t, err)
 			responseBody := string(bytes)
 			assert.Equal(t, testCase.status, w.Code)
