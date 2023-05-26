@@ -16,7 +16,7 @@ import (
 
 // Database is the JSON file implementation of the database store.
 type Database struct {
-	sync.Mutex
+	mutex    sync.Mutex
 	memory   *memory.Database
 	filepath string
 }
@@ -56,8 +56,8 @@ func (db *Database) String() string {
 }
 
 func (db *Database) Start() (runError <-chan error, err error) {
-	db.Lock()
-	defer db.Unlock()
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
 	return db.memory.Start()
 }
 
@@ -66,14 +66,14 @@ func (db *Database) Stop() (err error) {
 	if err != nil {
 		return fmt.Errorf("stopping memory database: %w", err)
 	}
-	db.Lock()
-	defer db.Unlock() // wait for ongoing operation to finish
+	db.mutex.Lock()
+	defer db.mutex.Unlock() // wait for ongoing operation to finish
 	return nil
 }
 
 func (db *Database) writeFile() error {
-	db.Lock()
-	defer db.Unlock()
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
 	b, err := json.Marshal(db.memory.GetData())
 	if err != nil {
 		return fmt.Errorf("%w: %w", dataerrors.ErrEncoding, err)
