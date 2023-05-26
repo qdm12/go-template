@@ -151,6 +151,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 	logger.Patch(log.SetLevel(*config.Log.Level))
 
+	logger.Info(config.String())
+
 	db, err := setupDatabase(config.Database, logger)
 	if err != nil {
 		return err
