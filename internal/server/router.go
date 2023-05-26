@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/qdm12/go-template/internal/config/settings"
@@ -29,7 +30,11 @@ func NewRouter(config settings.HTTP, logger Logger,
 	middlewares = append(middlewares, corsMiddleware)
 	router.Use(middlewares...)
 
-	APIPrefix := *config.RootURL + "/api/v1"
+	APIPrefix := *config.RootURL
+	for strings.HasSuffix(APIPrefix, "/") {
+		APIPrefix = strings.TrimSuffix(APIPrefix, "/")
+	}
+	APIPrefix += "/api/v1"
 
 	router.Mount(APIPrefix+"/users", users.NewHandler(logger, proc))
 	router.Mount(APIPrefix+"/build", build.NewHandler(logger, buildInfo))
