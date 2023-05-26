@@ -22,13 +22,15 @@ func Test_DecodeBody(t *testing.T) {
 	}
 
 	testCases := map[string]struct {
-		maxBytes     int64
-		requestBody  string
-		v            interface{}
-		expectedV    interface{}
-		ok           bool
-		status       int
-		responseBody string
+		maxBytes           int64
+		requestBody        string
+		v                  interface{}
+		expectedV          interface{}
+		ok                 bool
+		responseErrWrapped error
+		responseErrMessage string
+		status             int
+		responseBody       string
 	}{
 		"success": {
 			maxBytes:    1024,
@@ -75,10 +77,14 @@ func Test_DecodeBody(t *testing.T) {
 				strings.NewReader(testCase.requestBody),
 			)
 
-			ok := DecodeBody(
+			ok, responseErr := DecodeBody(
 				w, testCase.maxBytes, requestBody, testCase.v, contenttype.JSON)
 
 			require.Equal(t, testCase.ok, ok)
+			assert.ErrorIs(t, responseErr, testCase.responseErrWrapped)
+			if testCase.responseErrWrapped != nil {
+				assert.EqualError(t, responseErr, testCase.responseErrMessage)
+			}
 			bytes, err := io.ReadAll(w.Body)
 			require.NoError(t, err)
 			responseBody := string(bytes)

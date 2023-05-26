@@ -6,15 +6,28 @@ import (
 
 type Responder struct {
 	contentType string
+	logger      Logger
 }
 
-func NewResponder(contentType string) *Responder {
+type Logger interface {
+	Debugf(format string, args ...interface{})
+}
+
+func NewResponder(contentType string, logger Logger) *Responder {
 	return &Responder{
 		contentType: contentType,
+		logger:      logger,
 	}
 }
 
+// Respond responds the given error string and HTTP status
+// to the given http response writer.
+// If an error occurs responding, it is logged as a warning by
+// the responder warner.
 func (r *Responder) Respond(w http.ResponseWriter, status int,
 	errString string) {
-	Respond(w, status, errString, r.contentType)
+	err := Respond(w, status, errString, r.contentType)
+	if err != nil {
+		r.logger.Debugf("responding error: %s", err)
+	}
 }

@@ -12,8 +12,17 @@ import (
 	"github.com/qdm12/go-template/internal/server/httperr"
 )
 
+// DecodeBody decodes the HTTP JSON encoded body into v.
+// If the decoding succeeds, ok is returned as true.
+// If the decoding fails, the function writes an error over
+// HTTP to the client and returns ok as false.
+// If writing the response to the client fails, an non-nil
+// `errorResponseErr` error is returned as well.
+// Therefore the caller should check for `errorResponseErr`
+// every time `ok` is false.
 func DecodeBody(w http.ResponseWriter, maxBytes int64,
-	body io.ReadCloser, v interface{}, responseContentType string) (ok bool) {
+	body io.ReadCloser, v interface{}, responseContentType string) (
+	ok bool, responseErr error) {
 	body = http.MaxBytesReader(w, body, maxBytes)
 
 	decoder := json.NewDecoder(body)
@@ -22,16 +31,17 @@ func DecodeBody(w http.ResponseWriter, maxBytes int64,
 	err := decoder.Decode(v)
 	if err != nil {
 		errString, errCode := extractFromJSONErr(err)
-		httperr.Respond(w, errCode, errString, responseContentType)
-		return false
+		responseErr = httperr.Respond(w, errCode, errString, responseContentType)
+		return false, responseErr
 	}
+
 	err = decoder.Decode(&struct{}{})
-	if err != io.EOF {
-		const errString = "request body must only contain a single JSON object"
-		httperr.Respond(w, http.StatusBadRequest, errString, responseContentType)
-		return false
+	if errors.Is(err, io.EOF) {
+		return true, nil
 	}
-	return true
+	const errString = "request body must only contain a single JSON object"
+	responseErr = httperr.Respond(w, http.StatusBadRequest, errString, responseContentType)
+	return false, responseErr
 }
 
 func extractFromJSONErr(err error) (errString string, errCode int) {

@@ -100,6 +100,7 @@ func main() {
 	}
 }
 
+//nolint:cyclop
 func _main(ctx context.Context, buildInfo models.BuildInformation,
 	args []string, logger log.LoggerInterface, configSource ConfigSource) error {
 	ctx, cancel := context.WithCancel(ctx)
@@ -241,7 +242,8 @@ type Database interface {
 	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
 }
 
-func setupDatabase(databaseSettings settings.Database, logger log.LeveledLogger) (db Database, err error) {
+func setupDatabase(databaseSettings settings.Database, logger log.LeveledLogger) ( //nolint:ireturn
+	db Database, err error) {
 	switch *databaseSettings.Type {
 	case settings.MemoryStoreType:
 		return data.NewMemory()

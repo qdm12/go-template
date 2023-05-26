@@ -32,7 +32,7 @@ func (db *Database) Start() (runError <-chan error, err error) {
 		return nil, fmt.Errorf("%w", goservices.ErrAlreadyStarted)
 	}
 	db.running = true
-	return nil, nil
+	return nil, nil //nolint:nilnil
 }
 
 func (db *Database) Stop() (err error) {

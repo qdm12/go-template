@@ -9,7 +9,6 @@
 
 ## Config
 
-- [ ] Config structs `String()` and `Lines()` methods
 - [ ] Read secrets from files in `/var/run/`
 
 ## Server

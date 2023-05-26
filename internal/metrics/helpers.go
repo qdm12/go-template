@@ -21,13 +21,13 @@ func newCounterVec(name, help string, labelNames []string, register bool) (c *pr
 	}, labelNames)
 	if register {
 		if err := prometheus.Register(c); err != nil {
-			return nil, fmt.Errorf("%w: %s", ErrRegister, err)
+			return nil, fmt.Errorf("%w: %w", ErrRegister, err)
 		}
 	}
 	return c, nil
 }
 
-func newGauge(name, help string, register bool) (g prometheus.Gauge, err error) {
+func newGauge(name, help string, register bool) (g prometheus.Gauge, err error) { //nolint:ireturn
 	g = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: promNamespace,
 		Subsystem: promSubsystem,
@@ -36,7 +36,7 @@ func newGauge(name, help string, register bool) (g prometheus.Gauge, err error) 
 	})
 	if register {
 		if err := prometheus.Register(g); err != nil {
-			return nil, fmt.Errorf("%w: %s", ErrRegister, err)
+			return nil, fmt.Errorf("%w: %w", ErrRegister, err)
 		}
 	}
 	return g, nil
@@ -53,7 +53,7 @@ func newHistogramVec(name, help string, buckets []float64, labelNames []string, 
 	}, labelNames)
 	if register {
 		if err := prometheus.Register(h); err != nil {
-			return nil, fmt.Errorf("%w: %s", ErrRegister, err)
+			return nil, fmt.Errorf("%w: %w", ErrRegister, err)
 		}
 	}
 	return h, nil

@@ -18,7 +18,7 @@ import (
 func (h *handler) getUserByID(w http.ResponseWriter, r *http.Request) {
 	_, responseContentType, err := contenttype.APICheck(r.Header)
 	w.Header().Set("Content-Type", responseContentType)
-	errResponder := httperr.NewResponder(responseContentType)
+	errResponder := httperr.NewResponder(responseContentType, h.logger)
 
 	if err != nil {
 		errResponder.Respond(w, http.StatusBadRequest, err.Error())

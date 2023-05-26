@@ -68,7 +68,7 @@ func (db *Database) Start() (runError <-chan error, err error) {
 	db.running = true
 	// TODO have periodic ping to check connection is still alive
 	// and signal through the run error channel.
-	return nil, nil
+	return nil, nil //nolint:nilnil
 }
 
 // Stop stops the database and closes the connection.

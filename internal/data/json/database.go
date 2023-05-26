@@ -30,23 +30,23 @@ func NewDatabase(memory *memory.Database, filepath string) (*Database, error) {
 	}
 	exists, err := fileExists(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
+		return nil, fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
 	} else if !exists {
 		const perms fs.FileMode = 0600
 		err = os.WriteFile(filepath, nil, perms)
 		if err != nil {
-			return nil, fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
+			return nil, fmt.Errorf("%w: %w", dataerrors.ErrWriteFile, err)
 		}
 	}
 	rawData, err := os.ReadFile(filepath)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
+		return nil, fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
 	} else if len(rawData) == 0 {
 		if err := db.writeFile(); err != nil {
-			return nil, fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
+			return nil, fmt.Errorf("%w: %w", dataerrors.ErrWriteFile, err)
 		}
 	} else if err := db.readFile(); err != nil {
-		return nil, fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
+		return nil, fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
 	}
 	return &db, nil
 }
@@ -76,13 +76,13 @@ func (db *Database) writeFile() error {
 	defer db.Unlock()
 	b, err := json.Marshal(db.memory.GetData())
 	if err != nil {
-		return fmt.Errorf("%w: %s", dataerrors.ErrEncoding, err)
+		return fmt.Errorf("%w: %w", dataerrors.ErrEncoding, err)
 	}
 
 	const perms fs.FileMode = 0600
 	err = os.WriteFile(db.filepath, b, perms)
 	if err != nil {
-		return fmt.Errorf("%w: %s", dataerrors.ErrWriteFile, err)
+		return fmt.Errorf("%w: %w", dataerrors.ErrWriteFile, err)
 	}
 	return nil
 }
@@ -91,11 +91,11 @@ func (db *Database) writeFile() error {
 func (db *Database) readFile() error {
 	b, err := os.ReadFile(db.filepath)
 	if err != nil {
-		return fmt.Errorf("%w: %s", dataerrors.ErrReadFile, err)
+		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
 	}
 	var data models.Data
 	if err := json.Unmarshal(b, &data); err != nil {
-		return fmt.Errorf("%w: %s", dataerrors.ErrDecoding, err)
+		return fmt.Errorf("%w: %w", dataerrors.ErrDecoding, err)
 	}
 	db.memory.SetData(data)
 	return nil
