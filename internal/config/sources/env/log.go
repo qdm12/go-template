@@ -1,35 +1,34 @@
-package config
+package env
 
 import (
 	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/qdm12/golibs/params"
+	"github.com/qdm12/go-template/internal/config/settings"
+	"github.com/qdm12/gosettings/sources/env"
 	"github.com/qdm12/log"
 )
 
-type Log struct {
-	Level log.Level
-}
-
-func (l *Log) get(params.Interface) (err error) {
-	l.Level, err = readLogLevel()
+func readLog() (log settings.Log, err error) {
+	log.Level, err = readLogLevel()
 	if err != nil {
-		return err
+		return log, err
 	}
-	return nil
+
+	return log, nil
 }
 
-func readLogLevel() (level log.Level, err error) {
-	s := getCleanedEnv("LOG_LEVEL")
+func readLogLevel() (level *log.Level, err error) {
+	s := env.Get("LOG_LEVEL")
 	if s == "" {
-		return log.LevelInfo, nil //nolint:nilnil
+		return nil, nil //nolint:nilnil
 	}
 
-	level, err = parseLogLevel(s)
+	level = new(log.Level)
+	*level, err = parseLogLevel(s)
 	if err != nil {
-		return level, fmt.Errorf("environment variable LOG_LEVEL: %w", err)
+		return nil, fmt.Errorf("environment variable LOG_LEVEL: %w", err)
 	}
 
 	return level, nil

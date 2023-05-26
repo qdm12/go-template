@@ -2,7 +2,7 @@
 package data
 
 import (
-	"github.com/qdm12/go-template/internal/config"
+	"github.com/qdm12/go-template/internal/config/settings"
 	"github.com/qdm12/go-template/internal/data/json"
 	"github.com/qdm12/go-template/internal/data/memory"
 	"github.com/qdm12/go-template/internal/data/psql"
@@ -21,7 +21,7 @@ func NewJSON(filepath string) (db *json.Database, err error) {
 	return json.NewDatabase(memoryDatabase, filepath)
 }
 
-func NewPostgres(config config.Postgres, logger log.LeveledLogger) (
+func NewPostgres(config settings.PostgresDatabase, logger log.LeveledLogger) (
 	db *psql.Database, err error) {
 	return psql.NewDatabase(config, logger)
 }

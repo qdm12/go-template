@@ -14,14 +14,14 @@ import (
 	_ "github.com/breml/rootcerts"
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/qdm12/go-template/internal/config"
+	"github.com/qdm12/go-template/internal/config/settings"
+	"github.com/qdm12/go-template/internal/config/sources/env"
 	"github.com/qdm12/go-template/internal/data"
 	"github.com/qdm12/go-template/internal/health"
 	"github.com/qdm12/go-template/internal/metrics"
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
-	"github.com/qdm12/golibs/params"
 	"github.com/qdm12/goservices"
 	"github.com/qdm12/goservices/httpserver"
 	"github.com/qdm12/gosplash"
@@ -51,11 +51,11 @@ func main() {
 
 	logger := log.New()
 
-	env := params.New()
+	envSource := env.New()
 
 	errorCh := make(chan error)
 	go func() {
-		errorCh <- _main(ctx, buildInfo, args, logger, env)
+		errorCh <- _main(ctx, buildInfo, args, logger, envSource)
 	}()
 
 	// Wait for OS signal or run error
@@ -98,22 +98,24 @@ func main() {
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger log.LoggerInterface, env params.Interface) error {
+	args []string, logger log.LoggerInterface, configSource ConfigSource) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {
 		// Running the program in a separate instance through the Docker
 		// built-in healthcheck, in an ephemeral fashion to query the
 		// long running instance of the program about its status
-		client := health.NewClient()
-
-		var config config.Health
-		_, err := config.Read(env)
+		healthConfig := configSource.ReadHealth()
+		healthConfig.SetDefaults()
+		err := healthConfig.Validate()
 		if err != nil {
-			return err
+			return fmt.Errorf("health configuration is invalid: %w", err)
 		}
 
-		return client.Query(ctx, config.Address)
+		client := health.NewClient()
+		// TODO write listening address to file for the healthcheck to read
+		// since the user can pass '' to listen on any available port.
+		return client.Query(ctx, healthConfig.Address)
 	}
 
 	announcementExpiration, err := time.Parse("2006-01-02", "2021-07-14")
@@ -135,18 +137,19 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	})
 	fmt.Println(strings.Join(splashLines, "\n"))
 
-	var config config.Config
-	warnings, err := config.Read(env)
-	for _, warning := range warnings {
-		logger.Warn(warning)
-	}
+	config, err := configSource.Read()
 	if err != nil {
-		return err
+		return fmt.Errorf("reading configuration: %w", err)
+	}
+	config.SetDefaults()
+	err = config.Validate()
+	if err != nil {
+		return fmt.Errorf("configuration is invalid: %w", err)
 	}
 
-	logger.Patch(log.SetLevel(config.Log.Level))
+	logger.Patch(log.SetLevel(*config.Log.Level))
 
-	db, err := setupDatabase(config.Store, logger)
+	db, err := setupDatabase(config.Database, logger)
 	if err != nil {
 		return err
 	}
@@ -173,7 +176,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	serverSettings := httpserver.Settings{
 		Name:    ptrTo("main"),
 		Handler: server.NewRouter(config.HTTP, serverLogger, metrics, buildInfo, proc),
-		Address: &config.HTTP.Address,
+		Address: ptrTo(*config.HTTP.Address),
 		Logger:  serverLogger,
 	}
 	mainServer, err := httpserver.New(serverSettings)
@@ -231,17 +234,23 @@ type Database interface {
 	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
 }
 
-func setupDatabase(c config.Store, logger log.LeveledLogger) (db Database, err error) {
-	switch c.Type {
-	case config.MemoryStoreType:
+func setupDatabase(databaseSettings settings.Database, logger log.LeveledLogger) (db Database, err error) {
+	switch *databaseSettings.Type {
+	case settings.MemoryStoreType:
 		return data.NewMemory()
-	case config.JSONStoreType:
-		return data.NewJSON(c.JSON.Filepath)
-	case config.PostgresStoreType:
-		return data.NewPostgres(c.Postgres, logger)
+	case settings.JSONStoreType:
+		return data.NewJSON(databaseSettings.JSON.Filepath)
+	case settings.PostgresStoreType:
+		return data.NewPostgres(databaseSettings.Postgres, logger)
 	default:
-		return nil, fmt.Errorf("%w: %s", errDatabaseTypeUnknown, c.Type)
+		return nil, fmt.Errorf("%w: %s", errDatabaseTypeUnknown, *databaseSettings.Type)
 	}
 }
 
 func ptrTo[T any](x T) *T { return &x }
+
+type ConfigSource interface {
+	Read() (settings settings.Settings, err error)
+	ReadHealth() (health settings.Health)
+	String() string
+}
