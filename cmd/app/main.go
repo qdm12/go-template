@@ -36,14 +36,16 @@ var (
 )
 
 func main() {
-	ctx := context.Background()
-	ctx, stop := signal.NotifyContext(ctx, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
-
 	buildInfo := models.BuildInformation{
 		Version:   version,
 		Commit:    commit,
 		BuildDate: buildDate,
 	}
+
+	background := context.Background()
+	signalCh := make(chan os.Signal, 1)
+	signal.Notify(signalCh, os.Interrupt, syscall.SIGTERM)
+	ctx, cancel := context.WithCancel(background)
 
 	args := os.Args
 
@@ -56,24 +58,43 @@ func main() {
 		errorCh <- _main(ctx, buildInfo, args, logger, env)
 	}()
 
+	// Wait for OS signal or run error
+	var runError error
 	select {
-	case <-ctx.Done():
-		logger.Warn("Caught OS signal, shutting down\n")
-		stop()
-	case err := <-errorCh:
+	case receivedSignal := <-signalCh:
+		signal.Stop(signalCh)
+		fmt.Println("")
+		logger.Warn("Caught OS signal " + receivedSignal.String() + ", shutting down")
+		cancel()
+	case runError = <-errorCh:
 		close(errorCh)
-		if err == nil { // expected exit such as healthcheck query
+		if runError == nil { // expected exit such as healthcheck
 			os.Exit(0)
 		}
-		logger.Error("Fatal error: " + err.Error())
-		os.Exit(1)
+		logger.Error(runError.Error())
+		cancel()
 	}
 
-	err := <-errorCh
-	if err != nil {
-		logger.Error("shutdown error: " + err.Error())
+	// Shutdown timed sequence, and force exit on second OS signal
+	const shutdownGracePeriod = 5 * time.Second
+	timer := time.NewTimer(shutdownGracePeriod)
+	select {
+	case shutdownErr := <-errorCh:
+		timer.Stop()
+		if shutdownErr != nil {
+			logger.Warnf("Shutdown failed: %s", shutdownErr)
+			os.Exit(1)
+		}
+
+		logger.Info("Shutdown successful")
+		if runError != nil {
+			os.Exit(1)
+		}
+		os.Exit(0)
+	case <-timer.C:
+		logger.Warn("Shutdown timed out")
+		os.Exit(1)
 	}
-	os.Exit(1)
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
