@@ -13,7 +13,9 @@ import (
 )
 
 type Database interface {
-	Close() error
+	String() string
+	Start() (runError <-chan error, err error)
+	Stop() (err error)
 	CreateUser(ctx context.Context, user models.User) (err error)
 	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
 }

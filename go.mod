@@ -9,10 +9,10 @@ require (
 	github.com/lib/pq v1.10.3
 	github.com/prometheus/client_golang v1.11.0
 	github.com/qdm12/golibs v0.0.0-20210829185735-8ab22c3de994
-	github.com/qdm12/goshutdown v0.1.0
+	github.com/qdm12/goservices v0.1.0-rc1
 	github.com/qdm12/gosplash v0.1.0
 	github.com/qdm12/log v0.1.0
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.3
 )
 
 require (
@@ -31,5 +31,5 @@ require (
 	github.com/prometheus/procfs v0.6.0 // indirect
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	google.golang.org/protobuf v1.26.0-rc.1 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

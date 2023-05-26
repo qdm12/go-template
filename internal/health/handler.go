@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func newHandler(logger Logger, healthcheck func() error) http.Handler {
+func NewHandler(logger Logger, healthcheck func() error) http.Handler {
 	return &handler{
 		logger:      logger,
 		healthcheck: healthcheck,

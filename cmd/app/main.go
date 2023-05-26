@@ -13,6 +13,7 @@ import (
 
 	_ "github.com/breml/rootcerts"
 	_ "github.com/lib/pq"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/qdm12/go-template/internal/config"
 	"github.com/qdm12/go-template/internal/data"
 	"github.com/qdm12/go-template/internal/health"
@@ -21,7 +22,8 @@ import (
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
 	"github.com/qdm12/golibs/params"
-	"github.com/qdm12/goshutdown"
+	"github.com/qdm12/goservices"
+	"github.com/qdm12/goservices/httpserver"
 	"github.com/qdm12/gosplash"
 	"github.com/qdm12/log"
 )
@@ -130,66 +132,72 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 	proc := processor.NewProcessor(db)
 
-	metricsLogger := logger.New(log.SetComponent("metrics server"))
-	metricsServer := metrics.NewServer(config.Metrics.Address, metricsLogger)
+	metricsServerSettings := httpserver.Settings{
+		Name:    ptrTo("metrics"),
+		Handler: promhttp.Handler(),
+		Address: &config.Metrics.Address,
+		Logger:  logger.New(log.SetComponent("metrics server")),
+	}
+	metricsServer, err := httpserver.New(metricsServerSettings)
+	if err != nil {
+		return fmt.Errorf("creating metrics server: %w", err)
+	}
 	const registerMetrics = true
 	metrics, err := metrics.New(registerMetrics)
 	if err != nil {
 		return err
 	}
-	metricsServerHandler, metricsServerCtx, metricsServerDone := goshutdown.NewGoRoutineHandler(
-		"metrics", goshutdown.GoRoutineSettings{})
-	go func() {
-		defer close(metricsServerDone)
-		if err := metricsServer.Run(metricsServerCtx); err != nil {
-			logger.Error(err.Error())
-		}
-	}()
 
 	serverLogger := logger.New(log.SetComponent("http server"))
-	mainServer := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
-	serverHandler, serverCtx, serverDone := goshutdown.NewGoRoutineHandler(
-		"server", goshutdown.GoRoutineSettings{})
-	go func() {
-		defer close(serverDone)
-		if err := mainServer.Run(serverCtx); err != nil {
-			logger.Error(err.Error())
-			if errors.Is(err, server.ErrCrashed) {
-				cancel() // stop other routines
-			}
-		}
-	}()
+	serverSettings := httpserver.Settings{
+		Name:    ptrTo("main"),
+		Handler: server.NewRouter(config.HTTP, serverLogger, metrics, buildInfo, proc),
+		Address: &config.HTTP.Address,
+		Logger:  serverLogger,
+	}
+	mainServer, err := httpserver.New(serverSettings)
+	if err != nil {
+		return fmt.Errorf("creating main server: %w", err)
+	}
 
-	healthcheck := func() error { return nil }
 	heathcheckLogger := logger.New(log.SetComponent("healthcheck"))
-	healthServer := health.NewServer(config.Health.Address, heathcheckLogger, healthcheck)
-	healthServerHandler, healthServerCtx, healthServerDone := goshutdown.NewGoRoutineHandler(
-		"health", goshutdown.GoRoutineSettings{})
-	go func() {
-		defer close(healthServerDone)
-		if err := healthServer.Run(healthServerCtx); err != nil {
-			logger.Error(err.Error())
+	healthcheck := func() error { return nil }
+	healthServerHandler := health.NewHandler(heathcheckLogger, healthcheck)
+	healthServerSettings := httpserver.Settings{
+		Name:    ptrTo("health"),
+		Handler: healthServerHandler,
+		Address: &config.Health.Address,
+		Logger:  heathcheckLogger,
+	}
+	healthServer, err := httpserver.New(healthServerSettings)
+	if err != nil {
+		return fmt.Errorf("creating health server: %w", err)
+	}
+
+	sequenceSettings := goservices.SequenceSettings{
+		ServicesStart: []goservices.Service{db, metricsServer, healthServer, mainServer},
+		ServicesStop:  []goservices.Service{mainServer, db, healthServer, metricsServer},
+	}
+	services, err := goservices.NewSequence(sequenceSettings)
+	if err != nil {
+		return fmt.Errorf("creating sequence of services: %w", err)
+	}
+
+	runError, err := services.Start()
+	if err != nil {
+		return fmt.Errorf("starting services: %w", err)
+	}
+
+	select {
+	case <-ctx.Done():
+		err = services.Stop()
+		if err != nil {
+			return fmt.Errorf("stopping services: %w", err)
 		}
-	}()
-
-	// Adapt db.Close to the shutdown logic
-	dbCloseHandler, dbCloseCtx, dbCloseDone := goshutdown.NewGoRoutineHandler(
-		"close", goshutdown.GoRoutineSettings{})
-	go func() {
-		<-dbCloseCtx.Done()
-		db.Close()
-		close(dbCloseDone)
-	}()
-
-	groupServers := goshutdown.NewGroupHandler("servers", goshutdown.GroupSettings{})
-	groupServers.Add(metricsServerHandler, healthServerHandler, serverHandler)
-	groupDatabases := goshutdown.NewGroupHandler("databases", goshutdown.GroupSettings{})
-	groupDatabases.Add(dbCloseHandler)
-	shutdownOrder := goshutdown.NewOrder("", goshutdown.OrderSettings{})
-	shutdownOrder.Append(groupServers, groupDatabases)
-
-	<-ctx.Done()
-	return shutdownOrder.Shutdown(context.Background())
+		return nil
+	case err = <-runError:
+		return fmt.Errorf("one service crashed, all services stopped: %w", err)
+	}
 }
 
 var errDatabaseTypeUnknown = errors.New("database type is unknown")
@@ -206,3 +214,5 @@ func setupDatabase(c config.Store, logger log.LeveledLogger) (db data.Database, 
 		return nil, fmt.Errorf("%w: %s", errDatabaseTypeUnknown, c.Type)
 	}
 }
+
+func ptrTo[T any](x T) *T { return &x }

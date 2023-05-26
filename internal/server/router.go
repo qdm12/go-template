@@ -13,7 +13,7 @@ import (
 	"github.com/qdm12/go-template/internal/server/routes/users"
 )
 
-func newRouter(config config.HTTP, logger Logger,
+func NewRouter(config config.HTTP, logger Logger,
 	metrics metrics.Interface, buildInfo models.BuildInformation,
 	proc processor.Interface) *chi.Mux {
 	router := chi.NewRouter()

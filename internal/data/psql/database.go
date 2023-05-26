@@ -5,17 +5,21 @@ package psql
 import (
 	"database/sql"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/qdm12/go-template/internal/config"
 	"github.com/qdm12/golibs/crypto/random"
+	"github.com/qdm12/goservices"
 )
 
 // Database is the Postgres implementation of the database store.
 type Database struct {
-	sql    *sql.DB
-	logger Logger
-	random random.Randomer
+	startStopMutex sync.Mutex
+	running        bool
+	sql            *sql.DB
+	logger         Logger
+	random         random.Randomer
 }
 
 // NewDatabase creates a database connection pool in DB and pings the database.
@@ -26,12 +30,33 @@ func NewDatabase(config config.Postgres, logger Logger) (*Database, error) {
 	if err != nil {
 		return nil, err
 	}
+	return &Database{
+		sql:    db,
+		logger: logger,
+		random: random.NewRandom(),
+	}, nil
+}
+
+func (db *Database) String() string {
+	return "postgres database"
+}
+
+// Start pings the database, and if it fails, retries up to 3 times
+// before returning a start error.
+func (db *Database) Start() (runError <-chan error, err error) {
+	db.startStopMutex.Lock()
+	defer db.startStopMutex.Unlock()
+
+	if db.running {
+		return nil, fmt.Errorf("%w", goservices.ErrAlreadyStarted)
+	}
+
 	fails := 0
 	const maxFails = 3
 	const sleepDuration = 200 * time.Millisecond
 	var totalTryTime time.Duration
 	for {
-		err = db.Ping()
+		err = db.sql.Ping()
 		if err == nil {
 			break
 		}
@@ -42,14 +67,26 @@ func NewDatabase(config config.Postgres, logger Logger) (*Database, error) {
 		time.Sleep(sleepDuration)
 		totalTryTime += sleepDuration
 	}
-	return &Database{
-		sql:    db,
-		logger: logger,
-		random: random.NewRandom(),
-	}, nil
+
+	db.running = true
+	// TODO have periodic ping to check connection is still alive
+	// and signal through the run error channel.
+	return nil, nil
 }
 
-// Close closes the database and prevents new queries from starting.
-func (db *Database) Close() error {
-	return db.sql.Close()
+// Stop stops the database and closes the connection.
+func (db *Database) Stop() (err error) {
+	db.startStopMutex.Lock()
+	defer db.startStopMutex.Unlock()
+	if !db.running {
+		return fmt.Errorf("%w", goservices.ErrAlreadyStopped)
+	}
+
+	err = db.sql.Close()
+	if err != nil {
+		return fmt.Errorf("closing database connection: %w", err)
+	}
+
+	db.running = false
+	return nil
 }

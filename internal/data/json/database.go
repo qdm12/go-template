@@ -49,9 +49,20 @@ func NewDatabase(memory *memory.Database, filepath string) (*Database, error) {
 	return &db, nil
 }
 
-func (db *Database) Close() error {
-	if err := db.memory.Close(); err != nil {
-		return err
+func (db *Database) String() string {
+	return "JSON file database"
+}
+
+func (db *Database) Start() (runError <-chan error, err error) {
+	db.Lock()
+	defer db.Unlock()
+	return db.memory.Start()
+}
+
+func (db *Database) Stop() (err error) {
+	err = db.memory.Stop()
+	if err != nil {
+		return fmt.Errorf("stopping memory database: %w", err)
 	}
 	db.Lock()
 	defer db.Unlock() // wait for ongoing operation to finish
