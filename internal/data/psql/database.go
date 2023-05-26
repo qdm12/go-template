@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/qdm12/go-template/internal/config/settings"
-	"github.com/qdm12/golibs/crypto/random"
 	"github.com/qdm12/goservices"
 )
 
@@ -19,7 +18,6 @@ type Database struct {
 	running        bool
 	sql            *sql.DB
 	logger         Logger
-	random         random.Randomer
 }
 
 // NewDatabase creates a database connection pool in DB and pings the database.
@@ -33,7 +31,6 @@ func NewDatabase(config settings.PostgresDatabase, logger Logger) (*Database, er
 	return &Database{
 		sql:    db,
 		logger: logger,
-		random: random.NewRandom(),
 	}, nil
 }
 
