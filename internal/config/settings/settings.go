@@ -70,7 +70,7 @@ func (s *Settings) MergeWith(other Settings) {
 	s.Metrics.mergeWith(other.Metrics)
 	s.Log.mergeWith(other.Log)
 	s.Database.mergeWith(other.Database)
-	s.Health.mergeWith(other.Health)
+	s.Health.MergeWith(other.Health)
 }
 
 func (s *Settings) OverrideWith(other Settings) {

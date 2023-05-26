@@ -39,7 +39,7 @@ func (h *Health) copy() (copied Health) {
 	}
 }
 
-func (h *Health) mergeWith(other Health) {
+func (h *Health) MergeWith(other Health) {
 	h.Address = gosettings.MergeWithString(h.Address, other.Address)
 }
 

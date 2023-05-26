@@ -16,6 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/qdm12/go-template/internal/config/settings"
 	"github.com/qdm12/go-template/internal/config/sources/env"
+	"github.com/qdm12/go-template/internal/config/sources/merge"
 	"github.com/qdm12/go-template/internal/data"
 	"github.com/qdm12/go-template/internal/health"
 	"github.com/qdm12/go-template/internal/metrics"
@@ -52,10 +53,11 @@ func main() {
 	logger := log.New()
 
 	envSource := env.New()
+	mergeSource := merge.New(envSource)
 
 	errorCh := make(chan error)
 	go func() {
-		errorCh <- _main(ctx, buildInfo, args, logger, envSource)
+		errorCh <- _main(ctx, buildInfo, args, logger, mergeSource)
 	}()
 
 	// Wait for OS signal or run error
