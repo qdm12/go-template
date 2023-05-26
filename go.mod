@@ -1,6 +1,6 @@
 module github.com/qdm12/go-template
 
-go 1.17
+go 1.20
 
 require (
 	github.com/breml/rootcerts v0.1.1
