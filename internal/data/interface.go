@@ -9,7 +9,7 @@ import (
 	"github.com/qdm12/go-template/internal/data/memory"
 	"github.com/qdm12/go-template/internal/data/psql"
 	"github.com/qdm12/go-template/internal/models"
-	"github.com/qdm12/golibs/logging"
+	"github.com/qdm12/log"
 )
 
 type Database interface {
@@ -30,6 +30,6 @@ func NewJSON(filepath string) (Database, error) {
 	return json.NewDatabase(memoryDatabase, filepath)
 }
 
-func NewPostgres(config config.Postgres, logger logging.Logger) (Database, error) {
+func NewPostgres(config config.Postgres, logger log.LeveledLogger) (Database, error) {
 	return psql.NewDatabase(config, logger)
 }

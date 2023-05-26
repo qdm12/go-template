@@ -11,10 +11,9 @@ import (
 	metricsmware "github.com/qdm12/go-template/internal/server/middlewares/metrics"
 	"github.com/qdm12/go-template/internal/server/routes/build"
 	"github.com/qdm12/go-template/internal/server/routes/users"
-	"github.com/qdm12/golibs/logging"
 )
 
-func newRouter(config config.HTTP, logger logging.Logger,
+func newRouter(config config.HTTP, logger Logger,
 	metrics metrics.Interface, buildInfo models.BuildInformation,
 	proc processor.Interface) *chi.Mux {
 	router := chi.NewRouter()

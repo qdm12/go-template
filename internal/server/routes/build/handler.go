@@ -4,15 +4,14 @@ package build
 import (
 	"github.com/go-chi/chi"
 	"github.com/qdm12/go-template/internal/models"
-	"github.com/qdm12/golibs/logging"
 )
 
 type handler struct {
-	logger logging.Logger
+	logger Logger
 	build  models.BuildInformation
 }
 
-func NewHandler(logger logging.Logger, buildInfo models.BuildInformation) *chi.Mux {
+func NewHandler(logger Logger, buildInfo models.BuildInformation) *chi.Mux {
 	h := &handler{
 		logger: logger,
 		build:  buildInfo,

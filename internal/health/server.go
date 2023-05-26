@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/qdm12/golibs/logging"
 )
 
 var _ Runner = (*Server)(nil)
@@ -18,11 +16,11 @@ type Runner interface {
 
 type Server struct {
 	address string
-	logger  logging.Logger
+	logger  Logger
 	handler http.Handler
 }
 
-func NewServer(address string, logger logging.Logger, healthcheck func() error) *Server {
+func NewServer(address string, logger Logger, healthcheck func() error) *Server {
 	handler := newHandler(logger, healthcheck)
 	return &Server{
 		address: address,

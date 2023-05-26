@@ -9,7 +9,6 @@ import (
 	"github.com/qdm12/go-template/internal/metrics/mock_metrics"
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor/mock_processor"
-	"github.com/qdm12/golibs/logging/mock_logging"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,7 +19,7 @@ func Test_New(t *testing.T) {
 	config := config.HTTP{
 		Address: "test",
 	}
-	logger := mock_logging.NewMockLogger(ctrl)
+	logger := NewMockLogger(ctrl)
 	metrics := mock_metrics.NewMockInterface(ctrl)
 	buildInformation := models.BuildInformation{}
 	proc := mock_processor.NewMockInterface(ctrl)
@@ -38,8 +37,8 @@ func Test_server_Run(t *testing.T) {
 
 	const address = "127.0.0.1:9000"
 
-	logger := mock_logging.NewMockLogger(ctrl)
-	logger.EXPECT().Info("listening on " + address)
+	logger := NewMockLogger(ctrl)
+	logger.EXPECT().Infof("listening on %s", address)
 
 	server := &Server{
 		address: address,

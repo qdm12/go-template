@@ -12,7 +12,6 @@ import (
 	"github.com/qdm12/go-template/internal/metrics"
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor"
-	"github.com/qdm12/golibs/logging"
 )
 
 var _ Runner = (*Server)(nil)
@@ -23,12 +22,12 @@ type Runner interface {
 
 type Server struct {
 	address string
-	logger  logging.Logger
+	logger  Logger
 	handler http.Handler
 }
 
 func New(c config.HTTP, proc processor.Interface,
-	logger logging.Logger, metrics metrics.Interface,
+	logger Logger, metrics metrics.Interface,
 	buildInfo models.BuildInformation) *Server {
 	handler := newRouter(c, logger, metrics, buildInfo, proc)
 	return &Server{
@@ -54,7 +53,7 @@ func (s *Server) Run(ctx context.Context) error {
 		shutdownErrCh <- server.Shutdown(shutdownCtx)
 	}()
 
-	s.logger.Info("listening on " + s.address)
+	s.logger.Infof("listening on %s", s.address)
 	err := server.ListenAndServe()
 	if err != nil && !errors.Is(ctx.Err(), context.Canceled) { // server crashed
 		return fmt.Errorf("%w: %s", ErrCrashed, err)

@@ -2,11 +2,9 @@ package health
 
 import (
 	"net/http"
-
-	"github.com/qdm12/golibs/logging"
 )
 
-func newHandler(logger logging.Logger, healthcheck func() error) http.Handler {
+func newHandler(logger Logger, healthcheck func() error) http.Handler {
 	return &handler{
 		logger:      logger,
 		healthcheck: healthcheck,
@@ -14,7 +12,7 @@ func newHandler(logger logging.Logger, healthcheck func() error) http.Handler {
 }
 
 type handler struct {
-	logger      logging.Logger
+	logger      Logger
 	healthcheck func() error
 }
 

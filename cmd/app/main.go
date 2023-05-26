@@ -20,10 +20,10 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
-	"github.com/qdm12/golibs/logging"
 	"github.com/qdm12/golibs/params"
 	"github.com/qdm12/goshutdown"
 	"github.com/qdm12/gosplash"
+	"github.com/qdm12/log"
 )
 
 var (
@@ -45,7 +45,7 @@ func main() {
 
 	args := os.Args
 
-	logger := logging.New(logging.Settings{})
+	logger := log.New()
 
 	env := params.New()
 
@@ -75,7 +75,7 @@ func main() {
 }
 
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger logging.ParentLogger, env params.Interface) error {
+	args []string, logger log.LoggerInterface, env params.Interface) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {
@@ -121,7 +121,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return err
 	}
 
-	logger = logger.NewChild(logging.Settings{Level: config.Log.Level})
+	logger.Patch(log.SetLevel(config.Log.Level))
 
 	db, err := setupDatabase(config.Store, logger)
 	if err != nil {
@@ -130,7 +130,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 	proc := processor.NewProcessor(db)
 
-	metricsLogger := logger.NewChild(logging.Settings{Prefix: "metrics server: "})
+	metricsLogger := logger.New(log.SetComponent("metrics server"))
 	metricsServer := metrics.NewServer(config.Metrics.Address, metricsLogger)
 	const registerMetrics = true
 	metrics, err := metrics.New(registerMetrics)
@@ -146,7 +146,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		}
 	}()
 
-	serverLogger := logger.NewChild(logging.Settings{Prefix: "http server: "})
+	serverLogger := logger.New(log.SetComponent("http server"))
 	mainServer := server.New(config.HTTP, proc, serverLogger, metrics, buildInfo)
 	serverHandler, serverCtx, serverDone := goshutdown.NewGoRoutineHandler(
 		"server", goshutdown.GoRoutineSettings{})
@@ -161,7 +161,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	}()
 
 	healthcheck := func() error { return nil }
-	heathcheckLogger := logger.NewChild(logging.Settings{Prefix: "healthcheck: "})
+	heathcheckLogger := logger.New(log.SetComponent("healthcheck"))
 	healthServer := health.NewServer(config.Health.Address, heathcheckLogger, healthcheck)
 	healthServerHandler, healthServerCtx, healthServerDone := goshutdown.NewGoRoutineHandler(
 		"health", goshutdown.GoRoutineSettings{})
@@ -194,7 +194,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 var errDatabaseTypeUnknown = errors.New("database type is unknown")
 
-func setupDatabase(c config.Store, logger logging.Logger) (db data.Database, err error) {
+func setupDatabase(c config.Store, logger log.LeveledLogger) (db data.Database, err error) {
 	switch c.Type {
 	case config.MemoryStoreType:
 		return data.NewMemory()

@@ -1,26 +1,55 @@
 package config
 
 import (
-	"github.com/qdm12/golibs/logging"
+	"errors"
+	"fmt"
+	"strings"
+
 	"github.com/qdm12/golibs/params"
+	"github.com/qdm12/log"
 )
 
 type Log struct {
-	Level logging.Level
+	Level log.Level
 }
 
 func (l *Log) get(env params.Interface) (err error) {
-	l.Level, err = l.getLevel(env)
+	l.Level, err = readLogLevel()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (l *Log) getLevel(env params.Interface) (level logging.Level, err error) {
-	const envKey = "LOG_LEVEL"
-	options := []params.OptionSetter{
-		params.Default("info"),
+func readLogLevel() (level log.Level, err error) {
+	s := getCleanedEnv("LOG_LEVEL")
+	if s == "" {
+		return log.LevelInfo, nil //nolint:nilnil
 	}
-	return env.LogLevel(envKey, options...)
+
+	level, err = parseLogLevel(s)
+	if err != nil {
+		return level, fmt.Errorf("environment variable LOG_LEVEL: %w", err)
+	}
+
+	return level, nil
+}
+
+var ErrLogLevelUnknown = errors.New("log level is unknown")
+
+func parseLogLevel(s string) (level log.Level, err error) {
+	switch strings.ToLower(s) {
+	case "debug":
+		return log.LevelDebug, nil
+	case "info":
+		return log.LevelInfo, nil
+	case "warning":
+		return log.LevelWarn, nil
+	case "error":
+		return log.LevelError, nil
+	default:
+		return level, fmt.Errorf(
+			"%w: %q is not valid and can be one of debug, info, warning or error",
+			ErrLogLevelUnknown, s)
+	}
 }

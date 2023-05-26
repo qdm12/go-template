@@ -1,14 +1,12 @@
 package log
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/qdm12/golibs/clientip"
-	"github.com/qdm12/golibs/logging"
 )
 
-func New(logger logging.Logger, enabled bool) func(http.Handler) http.Handler {
+func New(logger Logger, enabled bool) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		return &logHandler{
 			childHandler:  handler,
@@ -21,7 +19,7 @@ func New(logger logging.Logger, enabled bool) func(http.Handler) http.Handler {
 
 type logHandler struct {
 	childHandler  http.Handler
-	logger        logging.Logger
+	logger        Logger
 	enabled       bool
 	httpReqParser clientip.HTTPRequestParser
 }
@@ -34,6 +32,6 @@ func (h *logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	customWriter := &statefulWriter{ResponseWriter: w}
 	h.childHandler.ServeHTTP(customWriter, r)
 	clientIP := h.httpReqParser.ParseHTTPRequest(r)
-	h.logger.Info(fmt.Sprintf("HTTP request: %d %s %s %s %d",
-		customWriter.status, r.Method, r.RequestURI, clientIP, customWriter.length))
+	h.logger.Infof("HTTP request: %d %s %s %s %d",
+		customWriter.status, r.Method, r.RequestURI, clientIP, customWriter.length)
 }

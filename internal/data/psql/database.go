@@ -9,18 +9,17 @@ import (
 
 	"github.com/qdm12/go-template/internal/config"
 	"github.com/qdm12/golibs/crypto/random"
-	"github.com/qdm12/golibs/logging"
 )
 
 // Database is the Postgres implementation of the database store.
 type Database struct {
 	sql    *sql.DB
-	logger logging.Logger
+	logger Logger
 	random random.Randomer
 }
 
 // NewDatabase creates a database connection pool in DB and pings the database.
-func NewDatabase(config config.Postgres, logger logging.Logger) (*Database, error) {
+func NewDatabase(config config.Postgres, logger Logger) (*Database, error) {
 	connStr := "postgres://" + config.User + ":" + config.Password +
 		"@" + config.Address + "/" + config.Address + "?sslmode=disable&connect_timeout=1"
 	db, err := sql.Open("postgres", connStr)
@@ -43,7 +42,11 @@ func NewDatabase(config config.Postgres, logger logging.Logger) (*Database, erro
 		time.Sleep(sleepDuration)
 		totalTryTime += sleepDuration
 	}
-	return &Database{db, logger, random.NewRandom()}, nil
+	return &Database{
+		sql:    db,
+		logger: logger,
+		random: random.NewRandom(),
+	}, nil
 }
 
 // Close closes the database and prevents new queries from starting.

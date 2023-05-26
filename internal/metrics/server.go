@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/qdm12/golibs/logging"
 )
 
 var _ Runner = (*Server)(nil)
@@ -19,11 +18,11 @@ type Runner interface {
 
 type Server struct {
 	address string
-	logger  logging.Logger
+	logger  Logger
 	handler http.Handler
 }
 
-func NewServer(address string, logger logging.Logger) *Server {
+func NewServer(address string, logger Logger) *Server {
 	return &Server{
 		address: address,
 		logger:  logger,
