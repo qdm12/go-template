@@ -202,7 +202,15 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 var errDatabaseTypeUnknown = errors.New("database type is unknown")
 
-func setupDatabase(c config.Store, logger log.LeveledLogger) (db data.Database, err error) {
+type Database interface {
+	String() string
+	Start() (runError <-chan error, err error)
+	Stop() (err error)
+	CreateUser(ctx context.Context, user models.User) (err error)
+	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
+}
+
+func setupDatabase(c config.Store, logger log.LeveledLogger) (db Database, err error) {
 	switch c.Type {
 	case config.MemoryStoreType:
 		return data.NewMemory()

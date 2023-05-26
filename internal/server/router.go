@@ -3,9 +3,7 @@ package server
 import (
 	"github.com/go-chi/chi"
 	"github.com/qdm12/go-template/internal/config"
-	"github.com/qdm12/go-template/internal/metrics"
 	"github.com/qdm12/go-template/internal/models"
-	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server/middlewares/cors"
 	logmware "github.com/qdm12/go-template/internal/server/middlewares/log"
 	metricsmware "github.com/qdm12/go-template/internal/server/middlewares/metrics"
@@ -14,8 +12,8 @@ import (
 )
 
 func NewRouter(config config.HTTP, logger Logger,
-	metrics metrics.Interface, buildInfo models.BuildInformation,
-	proc processor.Interface) *chi.Mux {
+	metrics Metrics, buildInfo models.BuildInformation,
+	proc Processor) *chi.Mux {
 	router := chi.NewRouter()
 
 	// Middlewares

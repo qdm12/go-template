@@ -1,4 +1,4 @@
-package users
+package processor
 
 import (
 	"context"
@@ -6,11 +6,7 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 )
 
-type Logger interface {
-	Error(s string)
-}
-
-type Processor interface {
+type Database interface {
 	CreateUser(ctx context.Context, user models.User) error
 	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
 }

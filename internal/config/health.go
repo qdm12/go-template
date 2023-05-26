@@ -4,8 +4,6 @@ import (
 	"github.com/qdm12/golibs/params"
 )
 
-var _ Reader = (*Health)(nil)
-
 type Health struct {
 	Address string
 }

@@ -4,12 +4,6 @@ import (
 	"net/http"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . ResponderInterface
-
-type ResponderInterface interface {
-	Respond(w http.ResponseWriter, status int, errString string)
-}
-
 type Responder struct {
 	contentType string
 }

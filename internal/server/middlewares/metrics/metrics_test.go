@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/golang/mock/gomock"
-	"github.com/qdm12/go-template/internal/metrics/mock_metrics"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -44,7 +43,7 @@ func Test_metricsMiddleware(t *testing.T) {
 		return time.Unix(unix, 0)
 	}
 
-	metrics := mock_metrics.NewMockInterface(ctrl)
+	metrics := NewMockMetrics(ctrl)
 	metrics.EXPECT().InflightRequestsGaugeAdd(1)
 	metrics.EXPECT().InflightRequestsGaugeAdd(-1)
 	metrics.EXPECT().RequestCountInc(routePattern, responseStatus)

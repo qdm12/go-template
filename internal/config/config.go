@@ -9,12 +9,6 @@ import (
 	"github.com/qdm12/golibs/params"
 )
 
-var _ Reader = (*Config)(nil)
-
-type Reader interface {
-	Read(env params.Interface) (warnings []string, err error)
-}
-
 type Config struct {
 	HTTP    HTTP
 	Metrics Metrics

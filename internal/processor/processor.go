@@ -3,16 +3,12 @@
 // the data store.
 package processor
 
-import (
-	"github.com/qdm12/go-template/internal/data"
-)
-
 type Processor struct {
-	db data.Database
+	db Database
 }
 
 // NewProcessor creates a new Processor object.
-func NewProcessor(db data.Database) *Processor {
+func NewProcessor(db Database) *Processor {
 	return &Processor{
 		db: db,
 	}

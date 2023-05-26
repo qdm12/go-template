@@ -9,17 +9,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-//go:generate mockgen -destination=mock_$GOPACKAGE/$GOFILE . Interface
-
-var _ Interface = (*Metrics)(nil)
-
-type Interface interface {
-	RequestCountInc(routePattern string, statusCode int)
-	ResponseBytesCountAdd(routePattern string, statusCode int, bytesWritten int)
-	InflightRequestsGaugeAdd(addition int)
-	ResponseTimeHistogramObserve(routePattern string, statusCode int, duration time.Duration)
-}
-
 type Metrics struct {
 	requestsCounter       *prometheus.CounterVec
 	responseBytesCounter  *prometheus.CounterVec

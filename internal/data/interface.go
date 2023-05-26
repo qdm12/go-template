@@ -2,23 +2,12 @@
 package data
 
 import (
-	"context"
-
 	"github.com/qdm12/go-template/internal/config"
 	"github.com/qdm12/go-template/internal/data/json"
 	"github.com/qdm12/go-template/internal/data/memory"
 	"github.com/qdm12/go-template/internal/data/psql"
-	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/log"
 )
-
-type Database interface {
-	String() string
-	Start() (runError <-chan error, err error)
-	Stop() (err error)
-	CreateUser(ctx context.Context, user models.User) (err error)
-	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
-}
 
 func NewMemory() (db *memory.Database, err error) {
 	return memory.NewDatabase()

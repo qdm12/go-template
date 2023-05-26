@@ -13,16 +13,8 @@ var (
 	ErrUserNotFound = errors.New("user not found")
 )
 
-type UserCreator interface {
-	CreateUser(ctx context.Context, user models.User) error
-}
-
 func (p *Processor) CreateUser(ctx context.Context, user models.User) error {
 	return p.db.CreateUser(ctx, user)
-}
-
-type UserGetter interface {
-	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)
 }
 
 func (p *Processor) GetUserByID(ctx context.Context, id uint64) (user models.User, err error) {

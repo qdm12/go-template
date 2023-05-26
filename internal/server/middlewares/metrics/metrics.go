@@ -8,10 +8,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/qdm12/go-template/internal/metrics"
 )
 
-func New(metrics metrics.Interface) func(http.Handler) http.Handler {
+func New(metrics Metrics) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		return &metricsHandler{
 			childHandler: handler,
@@ -23,7 +22,7 @@ func New(metrics metrics.Interface) func(http.Handler) http.Handler {
 
 type metricsHandler struct {
 	childHandler http.Handler
-	metrics      metrics.Interface
+	metrics      Metrics
 	timeNow      func() time.Time // for mocks
 }
 

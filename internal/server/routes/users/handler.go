@@ -3,15 +3,14 @@ package users
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/qdm12/go-template/internal/processor"
 )
 
 type handler struct {
-	proc   processor.Interface
+	proc   Processor
 	logger Logger
 }
 
-func NewHandler(logger Logger, proc processor.Interface) *chi.Mux {
+func NewHandler(logger Logger, proc Processor) *chi.Mux {
 	h := &handler{
 		proc:   proc,
 		logger: logger,
