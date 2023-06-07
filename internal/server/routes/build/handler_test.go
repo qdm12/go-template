@@ -104,7 +104,7 @@ func Test_handler(t *testing.T) {
 				values := response.Header.Values(expectedKey)
 				assert.Equal(t, expectedValues, values)
 			}
-			assert.Equal(t, http.StatusOK, response.StatusCode)
+			assert.Equal(t, testCase.expectedStatus, response.StatusCode)
 			responseData, err := io.ReadAll(response.Body)
 			require.NoError(t, err)
 			assert.Equal(t, testCase.expectedBody, string(responseData))
