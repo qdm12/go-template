@@ -74,27 +74,38 @@ func (db *Database) Stop() (err error) {
 func (db *Database) writeFile() error {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
-	b, err := json.Marshal(db.memory.GetData())
-	if err != nil {
-		return fmt.Errorf("%w: %w", dataerrors.ErrEncoding, err)
-	}
 
 	const perms fs.FileMode = 0600
-	err = os.WriteFile(db.filepath, b, perms)
+	file, err := os.OpenFile(db.filepath, os.O_WRONLY|os.O_TRUNC, perms)
 	if err != nil {
-		return fmt.Errorf("%w: %w", dataerrors.ErrWriteFile, err)
+		return fmt.Errorf("opening file: %w", err)
+	}
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(db.memory.GetData())
+	if err != nil {
+		_ = file.Close()
+		return fmt.Errorf("encoding data to file: %w", err)
+	}
+
+	err = file.Close()
+	if err != nil {
+		return fmt.Errorf("closing file: %w", err)
 	}
 	return nil
 }
 
 // readFile is only used when creating the database.
 func (db *Database) readFile() error {
-	b, err := os.ReadFile(db.filepath)
+	file, err := os.Open(db.filepath)
 	if err != nil {
 		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
 	}
+
+	decoder := json.NewDecoder(file)
 	var data models.Data
-	if err := json.Unmarshal(b, &data); err != nil {
+	err = decoder.Decode(&data)
+	if err != nil {
 		return fmt.Errorf("%w: %w", dataerrors.ErrDecoding, err)
 	}
 	db.memory.SetData(data)
