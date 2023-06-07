@@ -18,7 +18,7 @@ func (h *handler) createUser(w http.ResponseWriter, r *http.Request) {
 	errResponder := httperr.NewResponder(responseContentType, h.logger)
 
 	if err != nil {
-		errResponder.Respond(w, http.StatusBadRequest, err.Error())
+		errResponder.Respond(w, http.StatusNotAcceptable, err.Error())
 		return
 	}
 
