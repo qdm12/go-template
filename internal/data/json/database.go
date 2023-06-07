@@ -4,9 +4,11 @@ package json
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"sync"
 
 	dataerrors "github.com/qdm12/go-template/internal/data/errors"
@@ -44,10 +46,10 @@ func (db *Database) Start() (runError <-chan error, err error) {
 		return nil, fmt.Errorf("starting memory database: %w", err)
 	}
 
-	err = db.initDatabaseFile()
+	err = db.loadDatabaseFile()
 	if err != nil {
 		_ = db.memory.Stop()
-		return nil, fmt.Errorf("initializing database file: %w", err)
+		return nil, fmt.Errorf("loading database file: %w", err)
 	}
 
 	return runError, nil
@@ -67,10 +69,6 @@ func (db *Database) writeFile() error {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
-	return db.writeFileNoLock()
-}
-
-func (db *Database) writeFileNoLock() error {
 	const perms fs.FileMode = 0600
 	file, err := os.OpenFile(db.filepath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, perms)
 	if err != nil {
@@ -91,47 +89,41 @@ func (db *Database) writeFileNoLock() error {
 	return nil
 }
 
-// initDatabaseFile either creates the database file or loads
-// existing data from it into the memory database.
-func (db *Database) initDatabaseFile() (err error) {
-	exists, err := fileExists(db.filepath)
-	if err != nil {
-		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
-	}
-
-	if !exists {
-		return db.writeFileNoLock()
-	}
-
-	stat, err := os.Stat(db.filepath)
-	if err != nil {
-		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
-	}
-
-	if stat.Size() == 0 {
-		return db.writeFileNoLock()
-	}
-
-	err = db.readFile()
-	if err != nil {
-		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
-	}
-	return nil
-}
-
-// readFile is only used when initializing the database.
-func (db *Database) readFile() error {
+// loadDatabaseFile loads the data from the database file
+// if the file exists and is not empty. If the file does not
+// exist, its path parent directory is created.
+func (db *Database) loadDatabaseFile() (err error) {
 	file, err := os.Open(db.filepath)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			const perm fs.FileMode = 0700
+			return os.MkdirAll(filepath.Dir(db.filepath), perm)
+		}
 		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
+	}
+
+	stat, err := file.Stat()
+	if err != nil {
+		_ = file.Close()
+		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
+	} else if stat.Size() == 0 { // empty file
+		_ = file.Close()
+		return nil
 	}
 
 	decoder := json.NewDecoder(file)
 	var data models.Data
 	err = decoder.Decode(&data)
 	if err != nil {
+		_ = file.Close()
 		return fmt.Errorf("%w: %w", dataerrors.ErrDecoding, err)
 	}
 	db.memory.SetData(data)
+
+	err = file.Close()
+	if err != nil {
+		return fmt.Errorf("closing database file: %w", err)
+	}
+
 	return nil
 }
