@@ -21,34 +21,15 @@ type Database struct {
 	filepath string
 }
 
-// NewDatabase creates a JSON file at the filepath provided if needed,
-// and reads existing data in memory.
-func NewDatabase(memory *memory.Database, filepath string) (*Database, error) {
-	db := Database{
+// NewDatabase creates a JSON Database object with the memory
+// database and filepath given. Its `Start` method will either
+// initialize the JSON database file or load existing data from
+// an existing JSON file into the memory database.
+func NewDatabase(memory *memory.Database, filepath string) *Database {
+	return &Database{
 		memory:   memory,
 		filepath: filepath,
 	}
-	exists, err := fileExists(filepath)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
-	} else if !exists {
-		const perms fs.FileMode = 0600
-		err = os.WriteFile(filepath, nil, perms)
-		if err != nil {
-			return nil, fmt.Errorf("%w: %w", dataerrors.ErrWriteFile, err)
-		}
-	}
-	rawData, err := os.ReadFile(filepath)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
-	} else if len(rawData) == 0 {
-		if err := db.writeFile(); err != nil {
-			return nil, fmt.Errorf("%w: %w", dataerrors.ErrWriteFile, err)
-		}
-	} else if err := db.readFile(); err != nil {
-		return nil, fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
-	}
-	return &db, nil
 }
 
 func (db *Database) String() string {
@@ -58,7 +39,18 @@ func (db *Database) String() string {
 func (db *Database) Start() (runError <-chan error, err error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
-	return db.memory.Start()
+	runError, err = db.memory.Start()
+	if err != nil {
+		return nil, fmt.Errorf("starting memory database: %w", err)
+	}
+
+	err = db.initDatabaseFile()
+	if err != nil {
+		_ = db.memory.Stop()
+		return nil, fmt.Errorf("initializing database file: %w", err)
+	}
+
+	return runError, nil
 }
 
 func (db *Database) Stop() (err error) {
@@ -75,8 +67,12 @@ func (db *Database) writeFile() error {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
+	return db.writeFileNoLock()
+}
+
+func (db *Database) writeFileNoLock() error {
 	const perms fs.FileMode = 0600
-	file, err := os.OpenFile(db.filepath, os.O_WRONLY|os.O_TRUNC, perms)
+	file, err := os.OpenFile(db.filepath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, perms)
 	if err != nil {
 		return fmt.Errorf("opening file: %w", err)
 	}
@@ -95,7 +91,35 @@ func (db *Database) writeFile() error {
 	return nil
 }
 
-// readFile is only used when creating the database.
+// initDatabaseFile either creates the database file or loads
+// existing data from it into the memory database.
+func (db *Database) initDatabaseFile() (err error) {
+	exists, err := fileExists(db.filepath)
+	if err != nil {
+		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
+	}
+
+	if !exists {
+		return db.writeFileNoLock()
+	}
+
+	stat, err := os.Stat(db.filepath)
+	if err != nil {
+		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
+	}
+
+	if stat.Size() == 0 {
+		return db.writeFileNoLock()
+	}
+
+	err = db.readFile()
+	if err != nil {
+		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)
+	}
+	return nil
+}
+
+// readFile is only used when initializing the database.
 func (db *Database) readFile() error {
 	file, err := os.Open(db.filepath)
 	if err != nil {

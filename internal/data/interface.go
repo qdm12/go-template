@@ -18,7 +18,7 @@ func NewJSON(filepath string) (db *json.Database, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.NewDatabase(memoryDatabase, filepath)
+	return json.NewDatabase(memoryDatabase, filepath), nil
 }
 
 func NewPostgres(config settings.PostgresDatabase, logger log.LeveledLogger) (

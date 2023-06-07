@@ -20,8 +20,7 @@ func Test_Database(t *testing.T) {
 	filePath := filepath.Join(t.TempDir(), "database.json")
 
 	// Initialize database file
-	database, err := NewDatabase(memory, filePath)
-	require.NoError(t, err)
+	database := NewDatabase(memory, filePath)
 
 	runError, err := database.Start()
 	require.NoError(t, err)
