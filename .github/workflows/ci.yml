@@ -61,8 +61,22 @@ jobs:
       - name: Build final image
         run: docker build .
 
+  codeql:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: github/codeql-action/init@v2
+        with:
+          languages: go
+      - uses: github/codeql-action/autobuild@v2
+      - uses: github/codeql-action/analyze@v2
+
   publish:
-    needs: [verify]
+    needs: [verify, codeql]
     if: github.event_name == 'push'
     permissions:
       actions: read
