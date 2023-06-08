@@ -28,6 +28,9 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
     env:
       DOCKER_BUILDKIT: "1"
     steps:
@@ -61,6 +64,10 @@ jobs:
   publish:
     needs: [verify]
     if: github.event_name == 'push'
+    permissions:
+      actions: read
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
