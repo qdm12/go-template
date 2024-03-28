@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/qdm12/gosettings"
@@ -28,7 +29,7 @@ func (d *Database) setDefaults() {
 }
 
 var (
-	ErrDatabaseTypeUnknown = fmt.Errorf("database type is unknown")
+	ErrDatabaseTypeUnknown = errors.New("database type is unknown")
 )
 
 func (d *Database) validate() (err error) {

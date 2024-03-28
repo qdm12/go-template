@@ -27,7 +27,8 @@ func newCounterVec(name, help string, labelNames []string, register bool) (c *pr
 	return c, nil
 }
 
-func newGauge(name, help string, register bool) (g prometheus.Gauge, err error) { //nolint:ireturn
+func newGauge(name, help string, register bool) ( //nolint:ireturn
+	g prometheus.Gauge, err error) {
 	g = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: promNamespace,
 		Subsystem: promSubsystem,

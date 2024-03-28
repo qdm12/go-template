@@ -61,7 +61,7 @@ func Test_Router(t *testing.T) {
 					http.StatusOK, gomock.AssignableToTypeOf(time.Second))
 				return metrics
 			},
-			makeProcessor: func(ctrl *gomock.Controller) *MockProcessor {
+			makeProcessor: func(_ *gomock.Controller) *MockProcessor {
 				return nil
 			},
 			buildInfo: models.BuildInformation{

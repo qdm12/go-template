@@ -26,7 +26,7 @@ func Test_handler(t *testing.T) {
 		expectedBody   string
 	}{
 		"get_build": {
-			makeLogger: func(ctrl *gomock.Controller) *MockLogger {
+			makeLogger: func(_ *gomock.Controller) *MockLogger {
 				return nil
 			},
 			buildInfo: models.BuildInformation{
@@ -44,7 +44,7 @@ func Test_handler(t *testing.T) {
 				`"buildDate":"2023-05-26T00:00:00Z"}` + "\n",
 		},
 		"options": {
-			makeLogger: func(ctrl *gomock.Controller) *MockLogger {
+			makeLogger: func(_ *gomock.Controller) *MockLogger {
 				return nil
 			},
 			buildInfo: models.BuildInformation{

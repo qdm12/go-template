@@ -16,7 +16,7 @@ func Test_corsHandler(t *testing.T) {
 	allowedHeaders := []string{"Authorization"}
 	middleware := New(allowedOrigins, allowedHeaders)
 
-	childHandler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {})
+	childHandler := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {})
 	handler := middleware(childHandler)
 	server := httptest.NewServer(handler)
 	defer server.Close()
