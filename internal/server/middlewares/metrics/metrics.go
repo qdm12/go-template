@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 )
 
 func New(metrics Metrics) func(http.Handler) http.Handler {

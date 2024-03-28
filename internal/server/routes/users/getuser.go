@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	dataerr "github.com/qdm12/go-template/internal/data/errors"
 	"github.com/qdm12/go-template/internal/server/contenttype"
 	"github.com/qdm12/go-template/internal/server/httperr"
