@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/qdm12/go-template/internal/config/settings"
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/server/middlewares/cors"
