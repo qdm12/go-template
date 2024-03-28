@@ -3,6 +3,7 @@
 package psql
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"sync"
@@ -40,7 +41,7 @@ func (db *Database) String() string {
 
 // Start pings the database, and if it fails, retries up to 3 times
 // before returning a start error.
-func (db *Database) Start() (runError <-chan error, err error) {
+func (db *Database) Start(ctx context.Context) (runError <-chan error, err error) {
 	db.startStopMutex.Lock()
 	defer db.startStopMutex.Unlock()
 
@@ -53,9 +54,11 @@ func (db *Database) Start() (runError <-chan error, err error) {
 	const sleepDuration = 200 * time.Millisecond
 	var totalTryTime time.Duration
 	for {
-		err = db.sql.Ping()
+		err = db.sql.PingContext(ctx)
 		if err == nil {
 			break
+		} else if ctx.Err() != nil {
+			return nil, fmt.Errorf("pinging database: %w", err)
 		}
 		fails++
 		if fails == maxFails {

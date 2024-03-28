@@ -22,7 +22,7 @@ func Test_Database(t *testing.T) {
 	// Initialize database file
 	database := NewDatabase(memory, filePath)
 
-	runError, err := database.Start()
+	runError, err := database.Start(context.Background())
 	require.NoError(t, err)
 	assert.Nil(t, runError)
 
@@ -35,7 +35,7 @@ func Test_Database(t *testing.T) {
 	err = database.Stop()
 	require.NoError(t, err)
 
-	runError, err = database.Start()
+	runError, err = database.Start(context.Background())
 	require.NoError(t, err)
 	assert.Nil(t, runError)
 

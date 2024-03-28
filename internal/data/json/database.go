@@ -3,6 +3,7 @@
 package json
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -38,10 +39,10 @@ func (db *Database) String() string {
 	return "JSON file database"
 }
 
-func (db *Database) Start() (runError <-chan error, err error) {
+func (db *Database) Start(ctx context.Context) (runError <-chan error, err error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
-	runError, err = db.memory.Start()
+	runError, err = db.memory.Start(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("starting memory database: %w", err)
 	}

@@ -215,7 +215,7 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return fmt.Errorf("creating sequence of services: %w", err)
 	}
 
-	runError, err := services.Start()
+	runError, err := services.Start(ctx)
 	if err != nil {
 		return fmt.Errorf("starting services: %w", err)
 	}
@@ -236,7 +236,7 @@ var errDatabaseTypeUnknown = errors.New("database type is unknown")
 
 type Database interface {
 	String() string
-	Start() (runError <-chan error, err error)
+	Start(ctx context.Context) (runError <-chan error, err error)
 	Stop() (err error)
 	CreateUser(ctx context.Context, user models.User) (err error)
 	GetUserByID(ctx context.Context, id uint64) (user models.User, err error)

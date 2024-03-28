@@ -2,6 +2,7 @@
 package memory
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -25,7 +26,7 @@ func (db *Database) String() string {
 	return "memory database"
 }
 
-func (db *Database) Start() (runError <-chan error, err error) {
+func (db *Database) Start(_ context.Context) (runError <-chan error, err error) {
 	db.Lock()
 	defer db.Unlock()
 	if db.running {
