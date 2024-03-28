@@ -14,7 +14,7 @@ require (
 	github.com/qdm12/gotree v0.2.0
 	github.com/qdm12/govalid v0.2.0-rc1
 	github.com/qdm12/log v0.1.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
