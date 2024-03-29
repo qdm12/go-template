@@ -9,10 +9,9 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/prometheus/client_golang v1.19.0
 	github.com/qdm12/goservices v0.1.0
-	github.com/qdm12/gosettings v0.3.0-rc2
+	github.com/qdm12/gosettings v0.4.1
 	github.com/qdm12/gosplash v0.1.0
 	github.com/qdm12/gotree v0.2.0
-	github.com/qdm12/govalid v0.2.0-rc1
 	github.com/qdm12/log v0.1.0
 	github.com/stretchr/testify v1.9.0
 )
@@ -29,8 +28,10 @@ require (
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
-	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
+	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
 	golang.org/x/sys v0.16.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	kernel.org/pub/linux/libs/security/libcap/cap v1.2.69 // indirect
+	kernel.org/pub/linux/libs/security/libcap/psx v1.2.69 // indirect
 )

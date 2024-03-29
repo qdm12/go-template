@@ -5,16 +5,17 @@ import (
 	"fmt"
 
 	"github.com/qdm12/gosettings"
+	"github.com/qdm12/gosettings/reader"
 	"github.com/qdm12/gotree"
 	"github.com/qdm12/log"
 )
 
 type Log struct {
-	Level *log.Level
+	Level string
 }
 
 func (l *Log) setDefaults() {
-	l.Level = gosettings.DefaultPointer(l.Level, log.LevelInfo)
+	l.Level = gosettings.DefaultComparable(l.Level, log.LevelInfo.String())
 }
 
 var (
@@ -22,12 +23,10 @@ var (
 )
 
 func (l *Log) validate() (err error) {
-	switch *l.Level {
-	case log.LevelDebug, log.LevelInfo, log.LevelWarn, log.LevelError:
-	default:
-		return fmt.Errorf("%w: %d", ErrLogLevelUnknown, *l.Level)
+	_, err = log.ParseLevel(l.Level)
+	if err != nil {
+		return fmt.Errorf("log level: %w", err)
 	}
-
 	return nil
 }
 
@@ -39,14 +38,14 @@ func (l *Log) toLinesNode() (node *gotree.Node) {
 
 func (l *Log) copy() (copied Log) {
 	return Log{
-		Level: gosettings.CopyPointer(l.Level),
+		Level: l.Level,
 	}
 }
 
-func (l *Log) mergeWith(other Log) {
-	l.Level = gosettings.MergeWithPointer(l.Level, other.Level)
+func (l *Log) overrideWith(other Log) {
+	l.Level = gosettings.OverrideWithComparable(l.Level, other.Level)
 }
 
-func (l *Log) overrideWith(other Log) {
-	l.Level = gosettings.OverrideWithPointer(l.Level, other.Level)
+func (l *Log) read(r *reader.Reader) {
+	l.Level = r.String("LOG_LEVEL")
 }

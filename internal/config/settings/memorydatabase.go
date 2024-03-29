@@ -1,6 +1,9 @@
 package settings
 
-import "github.com/qdm12/gotree"
+import (
+	"github.com/qdm12/gosettings/reader"
+	"github.com/qdm12/gotree"
+)
 
 type MemoryDatabase struct{}
 
@@ -16,6 +19,6 @@ func (m *MemoryDatabase) copy() (copied MemoryDatabase) {
 	return MemoryDatabase{}
 }
 
-func (m *MemoryDatabase) mergeWith(MemoryDatabase) {}
-
 func (m *MemoryDatabase) overrideWith(MemoryDatabase) {}
+
+func (m *MemoryDatabase) read(_ *reader.Reader) {}

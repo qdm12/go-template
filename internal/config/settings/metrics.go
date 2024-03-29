@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/qdm12/gosettings"
+	"github.com/qdm12/gosettings/reader"
+	"github.com/qdm12/gosettings/validate"
 	"github.com/qdm12/gotree"
-	"github.com/qdm12/govalid"
-	"github.com/qdm12/govalid/address"
 )
 
 type Metrics struct {
@@ -15,12 +15,11 @@ type Metrics struct {
 }
 
 func (m *Metrics) setDefaults() {
-	m.Address = gosettings.DefaultString(m.Address, ":9090")
+	m.Address = gosettings.DefaultComparable(m.Address, ":9090")
 }
 
 func (m *Metrics) validate() (err error) {
-	addressOption := address.OptionListening(os.Geteuid())
-	err = govalid.ValidateAddress(m.Address, addressOption)
+	err = validate.ListeningAddress(m.Address, os.Geteuid())
 	if err != nil {
 		return fmt.Errorf("listening address: %w", err)
 	}
@@ -40,10 +39,10 @@ func (m *Metrics) copy() (copied Metrics) {
 	}
 }
 
-func (m *Metrics) mergeWith(other Metrics) {
-	m.Address = gosettings.MergeWithString(m.Address, other.Address)
+func (m *Metrics) overrideWith(other Metrics) {
+	m.Address = gosettings.OverrideWithComparable(m.Address, other.Address)
 }
 
-func (m *Metrics) overrideWith(other Metrics) {
-	m.Address = gosettings.OverrideWithString(m.Address, other.Address)
+func (m *Metrics) read(r *reader.Reader) {
+	m.Address = r.String("METRICS_SERVER_ADDRESS")
 }
