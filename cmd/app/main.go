@@ -15,8 +15,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/qdm12/go-template/internal/config/settings"
-	"github.com/qdm12/go-template/internal/config/sources/env"
-	"github.com/qdm12/go-template/internal/config/sources/merge"
 	"github.com/qdm12/go-template/internal/data"
 	"github.com/qdm12/go-template/internal/health"
 	"github.com/qdm12/go-template/internal/metrics"
@@ -26,6 +24,8 @@ import (
 	"github.com/qdm12/goservices"
 	"github.com/qdm12/goservices/hooks"
 	"github.com/qdm12/goservices/httpserver"
+	"github.com/qdm12/gosettings/reader"
+	"github.com/qdm12/gosettings/reader/sources/env"
 	"github.com/qdm12/gosplash"
 	"github.com/qdm12/log"
 )
@@ -53,12 +53,16 @@ func main() {
 
 	logger := log.New()
 
-	envSource := env.New()
-	mergeSource := merge.New(envSource)
+	reader := reader.New(reader.Settings{
+		Sources: []reader.Source{env.New(env.Settings{})},
+		HandleDeprecatedKey: func(source string, deprecatedKey string, currentKey string) {
+			logger.Warnf("Deprecated %s %q, please use %q instead", source, deprecatedKey, currentKey)
+		},
+	})
 
 	errorCh := make(chan error)
 	go func() {
-		errorCh <- _main(ctx, buildInfo, args, logger, mergeSource)
+		errorCh <- _main(ctx, buildInfo, args, logger, reader)
 	}()
 
 	// Wait for OS signal or run error
@@ -102,14 +106,15 @@ func main() {
 
 //nolint:cyclop
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger log.LoggerInterface, configSource ConfigSource) error {
+	args []string, logger log.LoggerInterface, configReader *reader.Reader) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {
 		// Running the program in a separate instance through the Docker
 		// built-in healthcheck, in an ephemeral fashion to query the
 		// long running instance of the program about its status
-		healthConfig := configSource.ReadHealth()
+		var healthConfig settings.Health
+		healthConfig.Read(configReader)
 		healthConfig.SetDefaults()
 		err := healthConfig.Validate()
 		if err != nil {
@@ -141,7 +146,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 	})
 	fmt.Println(strings.Join(splashLines, "\n"))
 
-	config, err := configSource.Read()
+	var config settings.Settings
+	err = config.Read(configReader)
 	if err != nil {
 		return fmt.Errorf("reading configuration: %w", err)
 	}
@@ -151,7 +157,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return fmt.Errorf("configuration is invalid: %w", err)
 	}
 
-	logger.Patch(log.SetLevel(*config.Log.Level))
+	logLevel, _ := log.ParseLevel(config.Log.Level) // level string already validated
+	logger.Patch(log.SetLevel(logLevel))
 
 	logger.Info(config.String())
 

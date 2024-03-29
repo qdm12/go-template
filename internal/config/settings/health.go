@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/qdm12/gosettings"
+	"github.com/qdm12/gosettings/reader"
+	"github.com/qdm12/gosettings/validate"
 	"github.com/qdm12/gotree"
-	"github.com/qdm12/govalid"
-	"github.com/qdm12/govalid/address"
 )
 
 type Health struct {
@@ -19,8 +19,7 @@ func (h *Health) SetDefaults() {
 }
 
 func (h *Health) Validate() (err error) {
-	addressOption := address.OptionListening(os.Geteuid())
-	err = govalid.ValidateAddress(h.Address, addressOption)
+	err = validate.ListeningAddress(h.Address, os.Geteuid())
 	if err != nil {
 		return fmt.Errorf("listening address: %w", err)
 	}
@@ -39,10 +38,10 @@ func (h *Health) copy() (copied Health) {
 	}
 }
 
-func (h *Health) MergeWith(other Health) {
-	h.Address = gosettings.MergeWithString(h.Address, other.Address)
+func (h *Health) overrideWith(other Health) {
+	h.Address = gosettings.OverrideWithComparable(h.Address, other.Address)
 }
 
-func (h *Health) overrideWith(other Health) {
-	h.Address = gosettings.OverrideWithString(h.Address, other.Address)
+func (h *Health) Read(r *reader.Reader) {
+	h.Address = r.String("HEALTH_ADDRESS")
 }

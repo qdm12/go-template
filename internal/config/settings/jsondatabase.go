@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/qdm12/gosettings"
+	"github.com/qdm12/gosettings/reader"
 	"github.com/qdm12/gotree"
 )
 
@@ -14,7 +15,7 @@ type JSONDatabase struct {
 }
 
 func (j *JSONDatabase) setDefaults() {
-	j.Filepath = gosettings.DefaultString(j.Filepath, "data.json")
+	j.Filepath = gosettings.DefaultComparable(j.Filepath, "data.json")
 }
 
 var (
@@ -43,10 +44,10 @@ func (j *JSONDatabase) copy() (copied JSONDatabase) {
 	}
 }
 
-func (j *JSONDatabase) mergeWith(other JSONDatabase) {
-	j.Filepath = gosettings.MergeWithString(j.Filepath, other.Filepath)
+func (j *JSONDatabase) overrideWith(other JSONDatabase) {
+	j.Filepath = gosettings.OverrideWithComparable(j.Filepath, other.Filepath)
 }
 
-func (j *JSONDatabase) overrideWith(other JSONDatabase) {
-	j.Filepath = gosettings.OverrideWithString(j.Filepath, other.Filepath)
+func (j *JSONDatabase) read(r *reader.Reader) {
+	j.Filepath = r.String("JSON_FILEPATH")
 }

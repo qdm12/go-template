@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/qdm12/gosettings"
+	"github.com/qdm12/gosettings/reader"
+	"github.com/qdm12/gosettings/validate"
 	"github.com/qdm12/gotree"
-	"github.com/qdm12/govalid"
-	"github.com/qdm12/govalid/address"
 )
 
 type HTTP struct {
@@ -22,21 +22,14 @@ func (h *HTTP) setDefaults() {
 	h.Address = gosettings.DefaultPointer(h.Address, ":8000")
 	h.RootURL = gosettings.DefaultPointer(h.RootURL, "")
 	h.LogRequests = gosettings.DefaultPointer(h.LogRequests, true)
-	h.AllowedOrigins = gosettings.DefaultSliceRaw(h.AllowedOrigins, []string{})
-	h.AllowedHeaders = gosettings.DefaultSliceRaw(h.AllowedHeaders, []string{})
+	h.AllowedOrigins = gosettings.DefaultSlice(h.AllowedOrigins, []string{})
+	h.AllowedHeaders = gosettings.DefaultSlice(h.AllowedHeaders, []string{})
 }
 
 func (h *HTTP) validate() (err error) {
-	addressOption := address.OptionListening(os.Geteuid())
-	err = govalid.ValidateAddress(*h.Address, addressOption)
+	err = validate.ListeningAddress(*h.Address, os.Geteuid())
 	if err != nil {
 		return fmt.Errorf("listening address: %w", err)
-	}
-
-	_, err = govalid.ValidateRootURL(*h.RootURL)
-	if err != nil {
-		fmt.Println("root url: ", *h.RootURL)
-		return fmt.Errorf("root URL: %w", err)
 	}
 
 	return nil
@@ -73,18 +66,22 @@ func (h *HTTP) copy() (copied HTTP) {
 	}
 }
 
-func (h *HTTP) mergeWith(other HTTP) {
-	h.Address = gosettings.MergeWithPointer(h.Address, other.Address)
-	h.RootURL = gosettings.MergeWithPointer(h.RootURL, other.RootURL)
-	h.LogRequests = gosettings.MergeWithPointer(h.LogRequests, other.LogRequests)
-	h.AllowedOrigins = gosettings.MergeWithSlice(h.AllowedOrigins, other.AllowedOrigins)
-	h.AllowedHeaders = gosettings.MergeWithSlice(h.AllowedHeaders, other.AllowedHeaders)
-}
-
 func (h *HTTP) overrideWith(other HTTP) {
 	h.Address = gosettings.OverrideWithPointer(h.Address, other.Address)
 	h.RootURL = gosettings.OverrideWithPointer(h.RootURL, other.RootURL)
 	h.LogRequests = gosettings.OverrideWithPointer(h.LogRequests, other.LogRequests)
 	h.AllowedOrigins = gosettings.OverrideWithSlice(h.AllowedOrigins, other.AllowedOrigins)
 	h.AllowedHeaders = gosettings.OverrideWithSlice(h.AllowedHeaders, other.AllowedHeaders)
+}
+
+func (h *HTTP) read(r *reader.Reader) (err error) {
+	h.Address = r.Get("HTTP_SERVER_ADDRESS")
+	h.RootURL = r.Get("HTTP_SERVER_ROOT_URL")
+	h.LogRequests, err = r.BoolPtr("HTTP_SERVER_LOG_REQUESTS")
+	if err != nil {
+		return fmt.Errorf("environment variable HTTP_SERVER_LOG_REQUESTS: %w", err)
+	}
+	h.AllowedOrigins = r.CSV("HTTP_SERVER_ALLOWED_ORIGINS")
+	h.AllowedHeaders = r.CSV("HTTP_SERVER_ALLOWED_HEADERS")
+	return nil
 }

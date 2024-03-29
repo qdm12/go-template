@@ -3,6 +3,7 @@ package settings
 import (
 	"fmt"
 
+	"github.com/qdm12/gosettings/reader"
 	"github.com/qdm12/gotree"
 )
 
@@ -65,18 +66,24 @@ func (s *Settings) Copy() (copied Settings) {
 	}
 }
 
-func (s *Settings) MergeWith(other Settings) {
-	s.HTTP.mergeWith(other.HTTP)
-	s.Metrics.mergeWith(other.Metrics)
-	s.Log.mergeWith(other.Log)
-	s.Database.mergeWith(other.Database)
-	s.Health.MergeWith(other.Health)
-}
-
 func (s *Settings) OverrideWith(other Settings) {
 	s.HTTP.overrideWith(other.HTTP)
 	s.Metrics.overrideWith(other.Metrics)
 	s.Log.overrideWith(other.Log)
 	s.Database.overrideWith(other.Database)
 	s.Health.overrideWith(other.Health)
+}
+
+func (s *Settings) Read(r *reader.Reader) (err error) {
+	err = s.HTTP.read(r)
+	if err != nil {
+		return fmt.Errorf("HTTP server settings: %w", err)
+	}
+
+	s.Metrics.read(r)
+	s.Log.read(r)
+	s.Database.read(r)
+	s.Health.Read(r)
+
+	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/qdm12/gosettings"
+	"github.com/qdm12/gosettings/reader"
 	"github.com/qdm12/gotree"
 )
 
@@ -79,16 +80,16 @@ func (d *Database) copy() (copied Database) {
 	}
 }
 
-func (d *Database) mergeWith(other Database) {
-	d.Type = gosettings.MergeWithPointer(d.Type, other.Type)
-	d.Memory.mergeWith(other.Memory)
-	d.JSON.mergeWith(other.JSON)
-	d.Postgres.mergeWith(other.Postgres)
-}
-
 func (d *Database) overrideWith(other Database) {
 	d.Type = gosettings.OverrideWithPointer(d.Type, other.Type)
 	d.Memory.overrideWith(other.Memory)
 	d.JSON.overrideWith(other.JSON)
 	d.Postgres.overrideWith(other.Postgres)
+}
+
+func (d *Database) read(r *reader.Reader) {
+	d.Type = r.Get("STORE_TYPE")
+	d.Memory.read(r)
+	d.JSON.read(r)
+	d.Postgres.read(r)
 }
