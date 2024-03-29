@@ -27,7 +27,7 @@ SHORT_DESCRIPTION
 ![GitHub repo size](https://img.shields.io/github/repo-size/qdm12/go-template)
 ![Go version](https://img.shields.io/github/go-mod/go-version/qdm12/go-template)
 
-[![MIT](https://img.shields.io/github/license/qdm12/go-template)](https://github.com/qdm12/go-template/master/LICENSE)
+[![MIT](https://img.shields.io/github/license/qdm12/go-template)](https://github.com/qdm12/go-template/main/LICENSE)
 ![Visitors count](https://visitor-badge.laobi.icu/badge?page_id=go-template.readme)
 
 ## Features
