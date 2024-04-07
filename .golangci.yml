@@ -3,6 +3,10 @@ linters-settings:
     locale: US
 
 issues:
+  exclude-dirs:
+    - .devcontainer
+    - .github
+    - postgres
   exclude-rules:
     - path: _test\.go
       linters:
@@ -91,9 +95,3 @@ linters:
     - wastedassign
     - whitespace
     - zerologlint
-
-run:
-  skip-dirs:
-    - .devcontainer
-    - .github
-    - postgres
