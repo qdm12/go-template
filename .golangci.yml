@@ -22,7 +22,6 @@ issues:
         - gochecknoglobals
 
 linters:
-  disable-all: true
   enable:
     - asasalint
     - asciicheck

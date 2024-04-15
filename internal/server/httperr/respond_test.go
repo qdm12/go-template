@@ -38,7 +38,8 @@ func Test_Respond(t *testing.T) {
 
 			w := httptest.NewRecorder()
 
-			Respond(w, testCase.status, testCase.errString, contenttype.JSON)
+			err := Respond(w, testCase.status, testCase.errString, contenttype.JSON)
+			require.NoError(t, err)
 
 			response := w.Result()
 			defer response.Body.Close()
