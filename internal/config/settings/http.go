@@ -16,6 +16,7 @@ type HTTP struct {
 	LogRequests    *bool
 	AllowedOrigins []string
 	AllowedHeaders []string
+	Websocket      Websocket
 }
 
 func (h *HTTP) setDefaults() {
@@ -24,12 +25,18 @@ func (h *HTTP) setDefaults() {
 	h.LogRequests = gosettings.DefaultPointer(h.LogRequests, true)
 	h.AllowedOrigins = gosettings.DefaultSlice(h.AllowedOrigins, []string{})
 	h.AllowedHeaders = gosettings.DefaultSlice(h.AllowedHeaders, []string{})
+	h.Websocket.setDefaults()
 }
 
 func (h *HTTP) validate() (err error) {
 	err = validate.ListeningAddress(*h.Address, os.Geteuid())
 	if err != nil {
 		return fmt.Errorf("listening address: %w", err)
+	}
+
+	err = h.Websocket.validate()
+	if err != nil {
+		return fmt.Errorf("websocket: %w", err)
 	}
 
 	return nil
@@ -53,6 +60,8 @@ func (h *HTTP) toLinesNode() (node *gotree.Node) {
 	}
 	node.AppendNode(allowedHeadersNode)
 
+	node.AppendNode(h.Websocket.toLinesNode())
+
 	return node
 }
 
@@ -63,6 +72,7 @@ func (h *HTTP) copy() (copied HTTP) {
 		LogRequests:    gosettings.CopyPointer(h.LogRequests),
 		AllowedOrigins: gosettings.CopySlice(h.AllowedOrigins),
 		AllowedHeaders: gosettings.CopySlice(h.AllowedHeaders),
+		Websocket:      h.Websocket.copy(),
 	}
 }
 
@@ -72,6 +82,7 @@ func (h *HTTP) overrideWith(other HTTP) {
 	h.LogRequests = gosettings.OverrideWithPointer(h.LogRequests, other.LogRequests)
 	h.AllowedOrigins = gosettings.OverrideWithSlice(h.AllowedOrigins, other.AllowedOrigins)
 	h.AllowedHeaders = gosettings.OverrideWithSlice(h.AllowedHeaders, other.AllowedHeaders)
+	h.Websocket.overrideWith(other.Websocket)
 }
 
 func (h *HTTP) read(r *reader.Reader) (err error) {
@@ -83,5 +94,6 @@ func (h *HTTP) read(r *reader.Reader) (err error) {
 	}
 	h.AllowedOrigins = r.CSV("HTTP_SERVER_ALLOWED_ORIGINS")
 	h.AllowedHeaders = r.CSV("HTTP_SERVER_ALLOWED_HEADERS")
+	h.Websocket.read(r)
 	return nil
 }

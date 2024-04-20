@@ -21,6 +21,7 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 	"github.com/qdm12/go-template/internal/processor"
 	"github.com/qdm12/go-template/internal/server"
+	"github.com/qdm12/go-template/internal/server/websocket"
 	"github.com/qdm12/goservices"
 	"github.com/qdm12/goservices/hooks"
 	"github.com/qdm12/goservices/httpserver"
@@ -197,6 +198,18 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 		return fmt.Errorf("creating main server: %w", err)
 	}
 
+	websocketServerLogger := logger.New(log.SetComponent("websocket server"))
+	websocketServerSettings := httpserver.Settings{
+		Name:    ptrTo("websocket"),
+		Handler: websocket.New(),
+		Address: config.HTTP.Websocket.Address,
+		Logger:  websocketServerLogger,
+	}
+	websocketServer, err := httpserver.New(websocketServerSettings)
+	if err != nil {
+		return fmt.Errorf("creating websocket server: %w", err)
+	}
+
 	heathcheckLogger := logger.New(log.SetComponent("healthcheck"))
 	healthcheck := func() error { return nil }
 	healthServerHandler := health.NewHandler(heathcheckLogger, healthcheck)
@@ -213,8 +226,8 @@ func _main(ctx context.Context, buildInfo models.BuildInformation,
 
 	servicesLogger := logger.New(log.SetComponent("services"))
 	sequenceSettings := goservices.SequenceSettings{
-		ServicesStart: []goservices.Service{db, metricsServer, healthServer, mainServer},
-		ServicesStop:  []goservices.Service{mainServer, db, healthServer, metricsServer},
+		ServicesStart: []goservices.Service{db, metricsServer, healthServer, websocketServer, mainServer},
+		ServicesStop:  []goservices.Service{mainServer, websocketServer, db, healthServer, metricsServer},
 		Hooks:         hooks.NewWithLog(servicesLogger),
 	}
 	services, err := goservices.NewSequence(sequenceSettings)
