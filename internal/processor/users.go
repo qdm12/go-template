@@ -9,9 +9,7 @@ import (
 	"github.com/qdm12/go-template/internal/models"
 )
 
-var (
-	ErrUserNotFound = errors.New("user not found")
-)
+var ErrUserNotFound = errors.New("user not found")
 
 func (p *Processor) CreateUser(ctx context.Context, user models.User) error {
 	return p.db.CreateUser(ctx, user)

@@ -16,7 +16,8 @@ import (
 
 func NewRouter(config settings.HTTP, logger Logger,
 	metrics Metrics, buildInfo models.BuildInformation,
-	proc Processor) *chi.Mux {
+	proc Processor,
+) *chi.Mux {
 	router := chi.NewRouter()
 
 	var middlewares []func(http.Handler) http.Handler

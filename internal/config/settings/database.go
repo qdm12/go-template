@@ -29,9 +29,7 @@ func (d *Database) setDefaults() {
 	d.Postgres.setDefaults()
 }
 
-var (
-	ErrDatabaseTypeUnknown = errors.New("database type is unknown")
-)
+var ErrDatabaseTypeUnknown = errors.New("database type is unknown")
 
 func (d *Database) validate() (err error) {
 	switch *d.Type {

@@ -22,7 +22,8 @@ import (
 // every time `ok` is false.
 func DecodeBody(w http.ResponseWriter, maxBytes int64,
 	body io.ReadCloser, v any, responseContentType string) (
-	ok bool, responseErr error) {
+	ok bool, responseErr error,
+) {
 	body = http.MaxBytesReader(w, body, maxBytes)
 
 	decoder := json.NewDecoder(body)

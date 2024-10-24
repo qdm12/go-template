@@ -22,6 +22,7 @@ func NewJSON(filepath string) (db *json.Database, err error) {
 }
 
 func NewPostgres(config settings.PostgresDatabase, logger log.LeveledLogger) (
-	db *psql.Database, err error) {
+	db *psql.Database, err error,
+) {
 	return psql.NewDatabase(config, logger)
 }

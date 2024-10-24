@@ -13,7 +13,8 @@ type errJSONWrapper struct {
 }
 
 func Respond(w http.ResponseWriter, status int,
-	errString, contentType string) (err error) {
+	errString, contentType string,
+) (err error) {
 	w.WriteHeader(status)
 	if errString == "" {
 		errString = http.StatusText(status)

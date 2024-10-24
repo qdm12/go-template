@@ -15,7 +15,8 @@ var (
 )
 
 func setCrossOriginHeaders(requestHeaders, responseHeaders http.Header,
-	allowedOrigins map[string]struct{}, allowedHeaders []string) error {
+	allowedOrigins map[string]struct{}, allowedHeaders []string,
+) error {
 	origin := requestHeaders.Get("Origin")
 	if len(origin) == 0 {
 		return errNoOriginHeader

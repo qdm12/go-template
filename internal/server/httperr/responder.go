@@ -25,7 +25,8 @@ func NewResponder(contentType string, logger Logger) *Responder {
 // If an error occurs responding, it is logged as a warning by
 // the responder warner.
 func (r *Responder) Respond(w http.ResponseWriter, status int,
-	errString string) {
+	errString string,
+) {
 	err := Respond(w, status, errString, r.contentType)
 	if err != nil {
 		r.logger.Debugf("responding error: %s", err)

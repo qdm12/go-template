@@ -107,7 +107,8 @@ func main() {
 
 //nolint:cyclop
 func _main(ctx context.Context, buildInfo models.BuildInformation,
-	args []string, logger log.LoggerInterface, configReader *reader.Reader) error {
+	args []string, logger log.LoggerInterface, configReader *reader.Reader,
+) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	if health.IsClientMode(args) {
@@ -263,7 +264,8 @@ type Database interface {
 }
 
 func setupDatabase(databaseSettings settings.Database, logger log.LeveledLogger) ( //nolint:ireturn
-	db Database, err error) {
+	db Database, err error,
+) {
 	switch *databaseSettings.Type {
 	case settings.MemoryStoreType:
 		return data.NewMemory()

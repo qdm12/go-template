@@ -8,9 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var (
-	ErrRegister = errors.New("registration error")
-)
+var ErrRegister = errors.New("registration error")
 
 func newCounterVec(name, help string, labelNames []string, register bool) (c *prometheus.CounterVec, err error) {
 	c = prometheus.NewCounterVec(prometheus.CounterOpts{
@@ -28,7 +26,8 @@ func newCounterVec(name, help string, labelNames []string, register bool) (c *pr
 }
 
 func newGauge(name, help string, register bool) ( //nolint:ireturn
-	g prometheus.Gauge, err error) {
+	g prometheus.Gauge, err error,
+) {
 	g = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: promNamespace,
 		Subsystem: promSubsystem,
@@ -44,7 +43,8 @@ func newGauge(name, help string, register bool) ( //nolint:ireturn
 }
 
 func newHistogramVec(name, help string, buckets []float64, labelNames []string, register bool) (
-	h *prometheus.HistogramVec, err error) {
+	h *prometheus.HistogramVec, err error,
+) {
 	h = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: promNamespace,
 		Subsystem: promSubsystem,

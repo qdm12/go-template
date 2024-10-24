@@ -7,7 +7,8 @@ import (
 )
 
 func APICheck(header http.Header) (
-	requestContentType, responseContentType string, err error) {
+	requestContentType, responseContentType string, err error,
+) {
 	accept := header.Get("Accept")
 	if accept == "" {
 		accept = JSON

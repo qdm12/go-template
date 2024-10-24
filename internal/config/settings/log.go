@@ -18,9 +18,7 @@ func (l *Log) setDefaults() {
 	l.Level = gosettings.DefaultComparable(l.Level, log.LevelInfo.String())
 }
 
-var (
-	ErrLogLevelUnknown = errors.New("log level is unknown")
-)
+var ErrLogLevelUnknown = errors.New("log level is unknown")
 
 func (l *Log) validate() (err error) {
 	_, err = log.ParseLevel(l.Level)

@@ -70,7 +70,7 @@ func (db *Database) writeFile() error {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
-	const perms fs.FileMode = 0600
+	const perms fs.FileMode = 0o600
 	file, err := os.OpenFile(db.filepath, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, perms)
 	if err != nil {
 		return fmt.Errorf("opening file: %w", err)
@@ -97,7 +97,7 @@ func (db *Database) loadDatabaseFile() (err error) {
 	file, err := os.Open(db.filepath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			const perm fs.FileMode = 0700
+			const perm fs.FileMode = 0o700
 			return os.MkdirAll(filepath.Dir(db.filepath), perm)
 		}
 		return fmt.Errorf("%w: %w", dataerrors.ErrReadFile, err)

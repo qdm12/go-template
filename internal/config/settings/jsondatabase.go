@@ -18,9 +18,7 @@ func (j *JSONDatabase) setDefaults() {
 	j.Filepath = gosettings.DefaultComparable(j.Filepath, "data.json")
 }
 
-var (
-	ErrJSONFilepathIsDirectory = errors.New("JSON filepath is a directory")
-)
+var ErrJSONFilepathIsDirectory = errors.New("JSON filepath is a directory")
 
 func (j *JSONDatabase) validate() (err error) {
 	stats, err := os.Stat(j.Filepath)

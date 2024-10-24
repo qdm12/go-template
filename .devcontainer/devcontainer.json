@@ -57,7 +57,8 @@
                         ""
                     ],
                     "usePlaceholders": false,
-                    "staticcheck": true
+                    "staticcheck": true,
+                    "formatting.gofumpt": true
                 },
                 "go.lintTool": "golangci-lint",
                 "go.lintOnSave": "package",
