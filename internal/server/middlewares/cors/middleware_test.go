@@ -24,7 +24,7 @@ func Test_corsHandler(t *testing.T) {
 	ctx := context.Background()
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, server.URL, nil)
 	require.NoError(t, err)
-	request.Header.Set("origin", "http://test")
+	request.Header.Set("Origin", "http://test")
 
 	client := server.Client()
 	response, err := client.Do(request)

@@ -52,7 +52,6 @@ func Test_setCrossOriginHeaders(t *testing.T) {
 		},
 	}
 	for name, testCase := range testCases {
-		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			requestHeaders := testCase.requestHeaders.Clone()
@@ -119,7 +118,6 @@ func Test_AllowCORSMethods(t *testing.T) {
 		},
 	}
 	for name, testCase := range testCases {
-		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 

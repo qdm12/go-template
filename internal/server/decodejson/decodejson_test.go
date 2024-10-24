@@ -69,7 +69,6 @@ func Test_DecodeBody(t *testing.T) {
 		},
 	}
 	for name, testCase := range testCases {
-		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			w := httptest.NewRecorder()
@@ -139,7 +138,6 @@ func Test_extractFromJSONErr(t *testing.T) {
 		},
 	}
 	for name, testCase := range testCases {
-		testCase := testCase
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			errString, errCode := extractFromJSONErr(testCase.err)

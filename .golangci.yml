@@ -20,6 +20,9 @@ issues:
       text: buildDate is a global variable
       linters:
         - gochecknoglobals
+    - linters:
+        - ireturn
+      text: ".+returns interface \\(github\\.com\\/prometheus\\/client_golang\\/prometheus\\.[a-zA-Z]+\\)$"
 
 linters:
   enable:
@@ -27,20 +30,25 @@ linters:
     - asciicheck
     - bidichk
     - bodyclose
+    - canonicalheader
     - containedctx
     - contextcheck
+    - copyloopvar
     - cyclop
     - decorder
     - dogsled
     - dupl
+    - dupword
     - durationcheck
     - err113
     - errchkjson
     - errname
     - errorlint
     - exhaustive
+    - fatcontext
     - forcetypeassert
     - gci
+    - gocheckcompilerdirectives
     - gochecknoglobals
     - gochecknoinits
     - gochecksumtype
@@ -60,12 +68,15 @@ linters:
     - importas
     - inamedparam
     - interfacebloat
+    - intrange
     - ireturn
     - lll
     - maintidx
     - makezero
+    - mirror
     - misspell
     - mnd
+    - musttag
     - nakedret
     - nestif
     - nilerr
@@ -73,6 +84,7 @@ linters:
     - noctx
     - nolintlint
     - nosprintfhostport
+    - paralleltest
     - perfsprint
     - prealloc
     - predeclared
