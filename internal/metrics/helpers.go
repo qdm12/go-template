@@ -61,7 +61,7 @@ func newHistogramVec(name, help string, buckets []float64, labelNames []string, 
 }
 
 func newResponseTimeHistogramVec(register bool) (responseTimeHistogram *prometheus.HistogramVec, err error) {
-	//nolint:gomnd
+	//nolint:mnd
 	buckets := []float64{
 		float64(time.Millisecond),
 		float64(10 * time.Millisecond),

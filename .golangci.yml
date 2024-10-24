@@ -11,7 +11,7 @@ issues:
     - path: _test\.go
       linters:
         - dupl
-        - goerr113
+        - err113
     - path: cmd/
       text: commit is a global variable
       linters:
@@ -34,12 +34,11 @@ linters:
     - dogsled
     - dupl
     - durationcheck
+    - err113
     - errchkjson
     - errname
     - errorlint
-    - execinquery
     - exhaustive
-    - exportloopref
     - forcetypeassert
     - gci
     - gochecknoglobals
@@ -50,10 +49,8 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - goerr113
     - goheader
     - goimports
-    - gomnd
     - gomoddirectives
     - goprintffuncname
     - gosec
@@ -67,6 +64,7 @@ linters:
     - maintidx
     - makezero
     - misspell
+    - mnd
     - nakedret
     - nestif
     - nilerr

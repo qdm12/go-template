@@ -50,13 +50,13 @@ func (h *HTTP) toLinesNode() (node *gotree.Node) {
 
 	allowedOriginsNode := gotree.New("Allowed origins:")
 	for _, allowedOrigin := range h.AllowedOrigins {
-		allowedOriginsNode.Appendf(allowedOrigin)
+		allowedOriginsNode.Append(allowedOrigin)
 	}
 	node.AppendNode(allowedOriginsNode)
 
 	allowedHeadersNode := gotree.New("Allowed headers:")
 	for _, allowedHeader := range h.AllowedHeaders {
-		allowedHeadersNode.Appendf(allowedHeader)
+		allowedHeadersNode.Append(allowedHeader)
 	}
 	node.AppendNode(allowedHeadersNode)
 
