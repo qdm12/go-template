@@ -44,9 +44,9 @@ func Test_Router(t *testing.T) {
 			},
 			makeLogger: func(ctrl *gomock.Controller) *MockLogger {
 				logger := NewMockLogger(ctrl)
-				logger.EXPECT().Infof("HTTP request: %d %s %s %s %dB %s",
+				logger.EXPECT().Infof("HTTP request: %d %s %s %s %s %dms",
 					http.StatusOK, http.MethodGet, "/rooturl/api/v1/build",
-					netip.AddrFrom4([4]byte{127, 0, 0, 1}), 73,
+					netip.AddrFrom4([4]byte{127, 0, 0, 1}), "73B",
 					gomock.AssignableToTypeOf(time.Second))
 				return logger
 			},
@@ -86,9 +86,9 @@ func Test_Router(t *testing.T) {
 			},
 			makeLogger: func(ctrl *gomock.Controller) *MockLogger {
 				logger := NewMockLogger(ctrl)
-				logger.EXPECT().Infof("HTTP request: %d %s %s %s %dB %s",
+				logger.EXPECT().Infof("HTTP request: %d %s %s %s %s %dms",
 					http.StatusCreated, http.MethodPost, "/api/v1/users",
-					netip.AddrFrom4([4]byte{127, 0, 0, 1}), 0,
+					netip.AddrFrom4([4]byte{127, 0, 0, 1}), "0B",
 					gomock.AssignableToTypeOf(time.Second))
 				return logger
 			},
