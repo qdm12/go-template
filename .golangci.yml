@@ -65,6 +65,7 @@ linters:
     - gosec
     - gosmopolitan
     - grouper
+    - iface
     - importas
     - inamedparam
     - interfacebloat
@@ -91,6 +92,7 @@ linters:
     - promlinter
     - protogetter
     - reassign
+    - recvcheck
     - revive
     - rowserrcheck
     - sloglint
